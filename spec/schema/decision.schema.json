@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Univeracity/agentisok/blob/main/spec/schema/decision.schema.json",
+  "title": "Agent Clearance Decision",
+  "description": "Exploratory AgentIsOK origin decision; not production-ready.",
+  "type": "object",
+  "required": [
+    "protocol_version",
+    "decision_id",
+    "challenge_id",
+    "request_binding_digest",
+    "evaluated_at",
+    "policy",
+    "decision",
+    "obligations",
+    "reasons"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": "0.1"
+    },
+    "decision_id": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 512
+    },
+    "challenge_id": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 512
+    },
+    "request_binding_digest": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "policy": {
+      "type": "object",
+      "required": ["id", "version"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "version": {
+          "type": "string",
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "decision": {
+      "enum": [
+        "allow",
+        "allow_with_obligations",
+        "step_up",
+        "deny",
+        "indeterminate"
+      ]
+    },
+    "obligations": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/obligation"
+      }
+    },
+    "reasons": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/reason"
+      }
+    },
+    "continuation_uri": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "maxLength": 2048
+    },
+    "clearance_artifact": {
+      "$ref": "#/$defs/clearanceArtifact"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "obligation": {
+      "type": "object",
+      "required": ["type", "parameters"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 512
+        },
+        "parameters": {
+          "type": "object",
+          "maxProperties": 32,
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "reason": {
+      "type": "object",
+      "required": ["code"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.:-]{0,127}$"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      },
+      "additionalProperties": false
+    },
+    "clearanceArtifact": {
+      "type": "object",
+      "required": ["format", "value", "expires_at", "key_confirmation"],
+      "properties": {
+        "format": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 512
+        },
+        "value": {
+          "type": "string",
+          "maxLength": 65536
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "key_confirmation": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

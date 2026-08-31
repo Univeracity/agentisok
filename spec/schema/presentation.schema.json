@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Univeracity/agentisok/blob/main/spec/schema/presentation.schema.json",
+  "title": "Agent Clearance Presentation",
+  "description": "Exploratory AgentIsOK evidence presentation; not production-ready.",
+  "type": "object",
+  "required": [
+    "protocol_version",
+    "response_id",
+    "challenge_id",
+    "created_at",
+    "request_binding_digest",
+    "presenter",
+    "evidence",
+    "proof"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": "0.1"
+    },
+    "response_id": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 512
+    },
+    "challenge_id": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 512
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "request_binding_digest": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "presenter": {
+      "type": "object",
+      "required": ["key_id", "proof_profile"],
+      "properties": {
+        "key_id": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 1024
+        },
+        "proof_profile": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 512
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/evidenceEnvelope"
+      }
+    },
+    "proof": {
+      "$ref": "#/$defs/proof"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "evidenceEnvelope": {
+      "type": "object",
+      "required": ["requirement_id", "profile", "format", "value"],
+      "properties": {
+        "requirement_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+        },
+        "profile": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 512
+        },
+        "format": {
+          "enum": ["embedded", "reference"]
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "string",
+              "maxLength": 65536
+            },
+            {
+              "type": "object",
+              "maxProperties": 128,
+              "additionalProperties": true
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "proof": {
+      "type": "object",
+      "required": ["profile", "key_id", "value"],
+      "properties": {
+        "profile": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 512
+        },
+        "key_id": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 1024
+        },
+        "value": {
+          "type": "string",
+          "maxLength": 65536
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

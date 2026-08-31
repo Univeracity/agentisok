@@ -1,1 +1,23 @@
+# Private local guidance
 docs/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.p12
+*.pem
+
+# Editor and operating-system files
+.DS_Store
+.idea/
+.vscode/
+
+# Common generated output
+__pycache__/
+.pytest_cache/
+node_modules/
+coverage/
+build/
+dist/

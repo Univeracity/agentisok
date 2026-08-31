@@ -1,0 +1,48 @@
+{
+  "protocol_version": "0.1",
+  "decision_id": "urn:uuid:74ac4c90-4d53-4b2c-a8d3-72e8269fe229",
+  "challenge_id": "urn:uuid:0d191f2f-73ae-4d41-b662-e1f45a968762",
+  "request_binding_digest": "sha-256=:EXAMPLE_BINDING_DIGEST:",
+  "evaluated_at": "2026-08-31T16:00:31Z",
+  "policy": {
+    "id": "availability-agent-policy",
+    "version": "2026-08-31.1"
+  },
+  "decision": "allow_with_obligations",
+  "obligations": [
+    {
+      "type": "urn:example:agent-clearance:obligation:rate-limit:0.1",
+      "parameters": {
+        "requests": 20,
+        "window_seconds": 3600,
+        "bucket": "origin_pairwise_subject"
+      }
+    },
+    {
+      "type": "urn:example:agent-clearance:obligation:maximum-results:0.1",
+      "parameters": {
+        "count": 100
+      }
+    },
+    {
+      "type": "urn:example:agent-clearance:obligation:step-up-before:0.1",
+      "parameters": {
+        "action": "reservation.commit"
+      }
+    }
+  ],
+  "reasons": [
+    {
+      "code": "evidence.sufficient"
+    },
+    {
+      "code": "policy.bounded_read"
+    }
+  ],
+  "clearance_artifact": {
+    "format": "urn:example:agent-clearance:artifact:sender-constrained:0.1",
+    "value": "EXAMPLE_CLEARANCE_ARTIFACT",
+    "expires_at": "2026-08-31T16:02:00Z",
+    "key_confirmation": "did:example:pairwise-agent-at-travel#key-1"
+  }
+}

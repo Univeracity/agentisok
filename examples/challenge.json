@@ -1,0 +1,56 @@
+{
+  "protocol_version": "0.1",
+  "challenge_id": "urn:uuid:0d191f2f-73ae-4d41-b662-e1f45a968762",
+  "nonce": "xW5qjPzVZfR7L2eH9sK4mQ1uB8cD6nT3aY0iO7pE5gA",
+  "origin": "https://travel.example",
+  "created_at": "2026-08-31T16:00:00Z",
+  "expires_at": "2026-08-31T16:02:00Z",
+  "request_binding": {
+    "method": "POST",
+    "target_uri": "https://travel.example/availability/search",
+    "content_digest": "sha-256=:EXAMPLE_REQUEST_DIGEST:",
+    "action": {
+      "type": "availability.read",
+      "resource": "hotel_inventory",
+      "constraints": {
+        "maximum_results": 100
+      }
+    }
+  },
+  "evidence_requirements": [
+    {
+      "id": "request-proof",
+      "class": "request_integrity",
+      "profiles": [
+        "urn:example:agent-clearance:profile:http-message-signatures:rfc9421"
+      ],
+      "required": true,
+      "max_age_seconds": 120,
+      "disclosures": []
+    },
+    {
+      "id": "bounded-mandate",
+      "class": "delegation",
+      "profiles": [
+        "urn:example:agent-clearance:profile:origin-scoped-mandate:0.1"
+      ],
+      "required": true,
+      "max_age_seconds": 900,
+      "disclosures": [
+        "mandate.action",
+        "mandate.expires_at",
+        "subject.pairwise_id"
+      ]
+    }
+  ],
+  "policy": {
+    "id": "availability-agent-policy",
+    "version": "2026-08-31.1"
+  },
+  "privacy": {
+    "pairwise_subject_required": true,
+    "natural_language_task_forbidden": true,
+    "retention_hint_seconds": 86400
+  },
+  "response_uri": "https://travel.example/.well-known/agent-clearance/challenges/0d191f2f-73ae-4d41-b662-e1f45a968762/responses"
+}
