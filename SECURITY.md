@@ -10,7 +10,9 @@ There are currently no supported production versions.
 
 Do not open a public issue for a vulnerability that could create exploitation risk.
 
-Use GitHub's private vulnerability reporting flow from the repository's **Security** tab. If that option is unavailable, contact a repository maintainer privately through the Univeracity organization to establish a secure reporting channel before sending sensitive details.
+Once private vulnerability reporting is enabled, use the reporting flow from the repository's **Security** tab. If that option is unavailable, contact a repository maintainer privately through the Univeracity organization to establish a secure reporting channel before sending sensitive details.
+
+Before changing the repository to public visibility, maintainers must enable private vulnerability reporting and verify that the reporting link works for a non-collaborator. GitHub does not expose that reporting feature while this repository remains private.
 
 Include when possible:
 
