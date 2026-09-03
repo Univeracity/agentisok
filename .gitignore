@@ -17,6 +17,9 @@ docs/
 # Common generated output
 __pycache__/
 .pytest_cache/
+*.egg-info/
+.venv/
+venv/
 node_modules/
 coverage/
 build/

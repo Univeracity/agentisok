@@ -2,7 +2,7 @@
   "protocol_version": "0.1",
   "decision_id": "urn:uuid:74ac4c90-4d53-4b2c-a8d3-72e8269fe229",
   "challenge_id": "urn:uuid:0d191f2f-73ae-4d41-b662-e1f45a968762",
-  "request_binding_digest": "sha-256=:EXAMPLE_BINDING_DIGEST:",
+  "request_binding_digest": "sha-256=:N0+hDWB8juNXBUV8A4TUc3icbCWUo/riKz1Xn+NdD14=:",
   "evaluated_at": "2026-08-31T16:00:31Z",
   "policy": {
     "id": "availability-agent-policy",
@@ -11,7 +11,8 @@
   "decision": "allow_with_obligations",
   "obligations": [
     {
-      "type": "urn:example:agent-clearance:obligation:rate-limit:0.1",
+      "type": "urn:agent-clearance:obligation:rate-limit:0.1",
+      "critical": true,
       "parameters": {
         "requests": 20,
         "window_seconds": 3600,
@@ -19,13 +20,24 @@
       }
     },
     {
-      "type": "urn:example:agent-clearance:obligation:maximum-results:0.1",
+      "type": "urn:agent-clearance:obligation:maximum-results:0.1",
+      "critical": true,
       "parameters": {
         "count": 100
       }
     },
     {
-      "type": "urn:example:agent-clearance:obligation:step-up-before:0.1",
+      "type": "urn:agent-clearance:obligation:action-restriction:0.1",
+      "critical": true,
+      "parameters": {
+        "actions": [
+          "availability.read"
+        ]
+      }
+    },
+    {
+      "type": "urn:agent-clearance:obligation:step-up-before:0.1",
+      "critical": true,
       "parameters": {
         "action": "reservation.commit"
       }
@@ -40,9 +52,9 @@
     }
   ],
   "clearance_artifact": {
-    "format": "urn:example:agent-clearance:artifact:sender-constrained:0.1",
-    "value": "EXAMPLE_CLEARANCE_ARTIFACT",
+    "format": "urn:agent-clearance:artifact:sender-constrained:0.1",
+    "value": "eyJhY3Rpb24iOiJhdmFpbGFiaWxpdHkucmVhZCIsImNoYWxsZW5nZV9pZCI6InVybjp1dWlkOjBkMTkxZjJmLTczYWUtNGQ0MS1iNjYyLWUxZjQ1YTk2ODc2MiIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTMxVDE2OjAyOjAwWiIsIm9ibGlnYXRpb25zIjpbeyJjcml0aWNhbCI6dHJ1ZSwicGFyYW1ldGVycyI6eyJidWNrZXQiOiJvcmlnaW5fcGFpcndpc2Vfc3ViamVjdCIsInJlcXVlc3RzIjoyMCwid2luZG93X3NlY29uZHMiOjM2MDB9LCJ0eXBlIjoidXJuOmFnZW50LWNsZWFyYW5jZTpvYmxpZ2F0aW9uOnJhdGUtbGltaXQ6MC4xIn0seyJjcml0aWNhbCI6dHJ1ZSwicGFyYW1ldGVycyI6eyJjb3VudCI6MTAwfSwidHlwZSI6InVybjphZ2VudC1jbGVhcmFuY2U6b2JsaWdhdGlvbjptYXhpbXVtLXJlc3VsdHM6MC4xIn0seyJjcml0aWNhbCI6dHJ1ZSwicGFyYW1ldGVycyI6eyJhY3Rpb25zIjpbImF2YWlsYWJpbGl0eS5yZWFkIl19LCJ0eXBlIjoidXJuOmFnZW50LWNsZWFyYW5jZTpvYmxpZ2F0aW9uOmFjdGlvbi1yZXN0cmljdGlvbjowLjEifSx7ImNyaXRpY2FsIjp0cnVlLCJwYXJhbWV0ZXJzIjp7ImFjdGlvbiI6InJlc2VydmF0aW9uLmNvbW1pdCJ9LCJ0eXBlIjoidXJuOmFnZW50LWNsZWFyYW5jZTpvYmxpZ2F0aW9uOnN0ZXAtdXAtYmVmb3JlOjAuMSJ9XSwib3JpZ2luIjoiaHR0cHM6Ly90cmF2ZWwuZXhhbXBsZSIsInByZXNlbnRlcl9rZXlfaWQiOiJodHRwczovL2hhcm5lc3MuZXhhbXBsZS9rZXlzL2svOGYzYTFjIiwicmVxdWVzdF9iaW5kaW5nX2RpZ2VzdCI6InNoYS0yNTY9Ok4wK2hEV0I4anVOWEJVVjhBNFRVYzNpY2JDV1VvL3JpS3oxWG4rTmREMTQ9OiIsInR5cCI6ImNsZWFyYW5jZS1hcnRpZmFjdCJ9.aBbPrwQCS6YKlqX07-Y_SYvYRNUr7Eof1-ppBaI7nyo0unKZC_7pEY1ol3rCRuZAIpOKeoUhJZs5HsxgKPVlAw",
     "expires_at": "2026-08-31T16:02:00Z",
-    "key_confirmation": "did:example:pairwise-agent-at-travel#key-1"
+    "key_confirmation": "https://harness.example/keys/k/8f3a1c"
   }
 }

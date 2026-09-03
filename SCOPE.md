@@ -93,6 +93,8 @@ The protocol should define a stable origin integration surface while allowing ev
 
 ## Maturity boundary
 
-The initial specification is an exploratory skeleton. It is not production-ready and does not yet define a registered HTTP authentication scheme, media type, well-known URI, assurance taxonomy, issuer governance framework, or finalized wire format.
+The specification is an exploratory skeleton plus a candidate HTTP binding and two evidence profiles. A reference loop and negative vectors exist in this repository. That is not production-ready and does not define a registered HTTP authentication scheme, media type, well-known URI, assurance taxonomy, issuer governance framework, or finalized wire format.
 
-Those decisions require implementation experience, security review, and multi-party interoperability.
+Those decisions require origin-side evidence, security review, and multi-party interoperability. A second independent implementation is required before the protocol is described as mature.
+
+The first origin evaluation should run in shadow mode: existing anti-automation controls remain authoritative, AgentIsOK decisions are compared, and the origin can reconstruct verification without an edge-only verdict. Draft `0.1` privacy is scoped disclosure to the origin, not unlinkability from a TLS terminator.

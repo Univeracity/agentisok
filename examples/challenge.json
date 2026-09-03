@@ -8,7 +8,7 @@
   "request_binding": {
     "method": "POST",
     "target_uri": "https://travel.example/availability/search",
-    "content_digest": "sha-256=:EXAMPLE_REQUEST_DIGEST:",
+    "content_digest": "sha-256=:KETbhs/rFCXhpI/rGM+GcjkBRkHDL9Dy6bKrQYiZjhE=:",
     "action": {
       "type": "availability.read",
       "resource": "hotel_inventory",
@@ -22,7 +22,7 @@
       "id": "request-proof",
       "class": "request_integrity",
       "profiles": [
-        "urn:example:agent-clearance:profile:http-message-signatures:rfc9421"
+        "urn:agent-clearance:profile:http-message-signatures:rfc9421:0.1"
       ],
       "required": true,
       "max_age_seconds": 120,
@@ -32,7 +32,7 @@
       "id": "bounded-mandate",
       "class": "delegation",
       "profiles": [
-        "urn:example:agent-clearance:profile:origin-scoped-mandate:0.1"
+        "urn:agent-clearance:profile:origin-scoped-mandate:0.1"
       ],
       "required": true,
       "max_age_seconds": 900,
@@ -52,5 +52,5 @@
     "natural_language_task_forbidden": true,
     "retention_hint_seconds": 86400
   },
-  "response_uri": "https://travel.example/.well-known/agent-clearance/challenges/0d191f2f-73ae-4d41-b662-e1f45a968762/responses"
+  "presentation_endpoint": "https://travel.example/.well-known/agent-clearance/presentations"
 }

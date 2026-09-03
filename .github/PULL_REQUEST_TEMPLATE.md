@@ -15,7 +15,8 @@ Describe the problem and the outcome of this change.
 - [ ] I read `PRINCIPLES.md`, `SCOPE.md`, and `IPR-POLICY.md`.
 - [ ] The change remains independently implementable without an AgentIsOK-hosted dependency.
 - [ ] I considered security, privacy, accessibility, and ecosystem-concentration effects.
-- [ ] I updated schemas, examples, threat analysis, and tests where relevant.
+- [ ] I updated schemas, profiles, examples, threat analysis, and tests where relevant.
+- [ ] If I changed protocol objects, I regenerated examples and vectors with `agent-clearance-generate`.
 - [ ] I identified copied or adapted third-party material and its license.
 - [ ] My commits include a DCO `Signed-off-by` line.
 

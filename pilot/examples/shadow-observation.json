@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1",
+  "event_id": "77869bc3-4159-45dd-8eac-7d60ac24a13e",
+  "occurred_at": "2026-09-03T17:23:00.000Z",
+  "deployment_id": "travel-pilot",
+  "route_template": "/availability/search",
+  "action_type": "availability.read",
+  "risk_tier": "bounded_read",
+  "sample_probability": 0.01,
+  "incumbent_decision": "block",
+  "agent_clearance_decision": "allow_with_obligations",
+  "reason_codes": ["evidence.sufficient", "policy.bounded_read"],
+  "critical_obligations": ["urn:agent-clearance:obligation:rate-limit:0.1"],
+  "obligations_enforceable": true,
+  "verification_latency_ms": 18,
+  "evidence_profiles": ["urn:agent-clearance:profile:origin-scoped-mandate:0.1"],
+  "evidence_result": "valid",
+  "outcome_label": "unknown",
+  "label_source": "unknown",
+  "verifier_version": "reference/0.1.0",
+  "policy_version": "pilot-1",
+  "error_class": "none"
+}

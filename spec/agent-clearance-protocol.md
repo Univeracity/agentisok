@@ -1,9 +1,11 @@
 # Agent Clearance Protocol
 
-- **Working name:** Agent Clearance Protocol (ACP)
+- **Working name:** Agent Clearance Protocol
 - **Draft:** `00`
 - **Protocol version in examples:** `0.1`
-- **Status:** Exploratory skeleton; incomplete and not suitable for production
+- **Status:** Exploratory skeleton with a candidate HTTP binding and two evidence profiles; incomplete and not suitable for production
+
+Do not abbreviate the protocol as “ACP.” That short name is already used by unrelated agent protocols. Use **Agent Clearance Protocol**, or the token `agent-clearance`, in technical identifiers.
 
 ## Abstract
 
@@ -27,7 +29,7 @@ The protocol must:
 4. Preserve evidence provenance through verification.
 5. Minimize identity and task disclosure.
 6. Distinguish denial, step-up, and operational uncertainty.
-7. Express enforceable obligations.
+7. Express enforceable obligations, with unknown *critical* obligations failing closed.
 8. Permit local and self-hosted verification without a protocol-critical AgentIsOK service.
 9. Support competing implementations through public schemas and conformance vectors.
 10. Compose existing security and authorization standards.
@@ -67,7 +69,7 @@ This protocol does not define:
 
 **Obligation:** A structured condition that the policy enforcement point must enforce for a decision to remain valid.
 
-**Origin:** The relying HTTP origin controlling the protected resource and final policy.
+**Origin:** The relying HTTP origin controlling the protected resource and final policy. In this draft an origin is an `https` scheme, host, and optional port with no userinfo, path, query, or fragment.
 
 **Presenter:** The key-holding agent or harness instance that binds a response to the request.
 
@@ -85,6 +87,16 @@ REQUESTED -> CHALLENGED -> PRESENTED -> VERIFIED -> DECIDED -> ENFORCED
 
 An origin can skip a challenge when a valid clearance artifact or ordinary policy already permits the request. Any parse, verification, or dependency failure transitions to a safe `indeterminate` or denial path according to explicit origin policy; it must not silently grant access.
 
+The candidate HTTP mapping for this state machine is in [Section 8](#8-candidate-http-binding). In short:
+
+1. The agent makes the protected request.
+2. The origin returns `401` with a challenge.
+3. The agent POSTs a presentation to the origin's single presentation endpoint.
+4. The origin returns a decision and may issue a sender-constrained artifact.
+5. The agent retries the protected request with that artifact.
+
+The presentation HTTP request carries the proof. The presentation JSON object does not contain a second signature.
+
 ## 6. Protocol objects
 
 ### 6.1 Challenge
@@ -100,9 +112,11 @@ A challenge contains:
 - `evidence_requirements` — typed requirements and acceptable profiles;
 - `policy` — origin policy identifier and version;
 - `privacy` — disclosure and linkability constraints; and
-- `response_uri` — endpoint for the candidate detached-response binding.
+- `presentation_endpoint` — the origin's single HTTPS endpoint for presentations.
 
-The origin MUST NOT issue a challenge whose `expires_at` is earlier than `created_at`. The verifier MUST reject a challenge outside its validity window.
+`presentation_endpoint` MUST be on the same origin as `origin`, MUST use HTTPS, and MUST match the discovery document when discovery is used. Origins MUST NOT mint a distinct presentation URL per challenge.
+
+The origin MUST NOT issue a challenge whose `expires_at` is earlier than or equal to `created_at`. The verifier MUST reject a challenge outside its validity window.
 
 The challenge SHOULD request the minimum evidence needed for the action. A natural-language task description SHOULD NOT be required when a structured action, limit, or commitment is sufficient.
 
@@ -115,6 +129,8 @@ The request binding identifies the attempted operation:
 - structured action type;
 - optional resource and constraints; and
 - content digest for any representation whose content affects authorization.
+
+The **request-binding digest** is `sha-256=:base64digest:` over the UTF-8 JSON object containing `method`, `target_uri`, `action`, and `content_digest` when present. Object keys are serialized in lexicographic order, JSON objects use no insignificant whitespace, and Unicode is unescaped except for the characters JSON must escape. This is a prototype canonicalization. A later draft should adopt [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) unless interoperability testing shows a reason not to.
 
 Profiles MUST define how redirects, query normalization, intermediary rewriting, retries, and bodies are handled. Origins MUST reject ambiguous bindings.
 
@@ -129,6 +145,8 @@ Each requirement includes:
 - maximum acceptable evidence age where applicable; and
 - explicitly requested disclosures.
 
+Requirement `id` values MUST be unique within a challenge.
+
 The initial classes are provisional:
 
 - `request_integrity`;
@@ -141,6 +159,16 @@ The initial classes are provisional:
 
 These classes describe evidence purpose, not assurance level. The protocol does not define a single assurance ladder in draft `00`.
 
+Draft `0.1` profiles:
+
+| Class | Profile | Document |
+|---|---|---|
+| `request_integrity` | `urn:agent-clearance:profile:http-message-signatures:rfc9421:0.1` | [http-message-signatures.md](profiles/http-message-signatures.md) |
+| `request_integrity` | `urn:agent-clearance:profile:web-bot-auth:0.1` | [web-bot-auth.md](profiles/web-bot-auth.md) |
+| `delegation` | `urn:agent-clearance:profile:origin-scoped-mandate:0.1` | [origin-scoped-mandate.md](profiles/origin-scoped-mandate.md) |
+
+An origin MAY accept more than one profile for a class. The agent selects one.
+
 ### 6.4 Presentation
 
 A presentation contains:
@@ -150,9 +178,10 @@ A presentation contains:
 - `challenge_id`;
 - `created_at`;
 - a request-binding digest;
-- presenter key and proof profile;
-- one evidence envelope per satisfied requirement; and
-- a proof over the presentation and protected request binding.
+- presenter key and proof profile; and
+- one evidence envelope per satisfied requirement.
+
+It does **not** contain an embedded proof field. The HTTP request that carries the presentation is signed according to the selected `request_integrity` profile, which in the candidate binding is HTTP Message Signatures.
 
 An evidence envelope identifies the `requirement_id`, evidence `profile`, representation format, and embedded value or reference. Evidence profiles define size limits, retrieval security, issuer discovery, validation, revocation, and normalized output.
 
@@ -200,22 +229,30 @@ Allowed values are:
 
 `challenge` is a protocol state, not a decision value.
 
-Reason codes SHOULD be stable and coarse enough not to expose private evidence or sensitive fraud logic. Detailed diagnostic records belong in appropriately protected origin logs.
+Consistency rules:
+
+- `allow` MUST NOT include obligations.
+- `allow_with_obligations` MUST include at least one obligation.
+- `step_up` MUST include a `continuation_uri` or a replacement challenge.
+- `deny` and `indeterminate` MUST NOT include a clearance artifact that would grant access.
+
+Reason codes SHOULD be stable and coarse enough not to expose private evidence or sensitive fraud logic. Detailed diagnostic records belong in appropriately protected origin logs. A starter list is in [vocabulary/reason-codes.md](vocabulary/reason-codes.md).
 
 ### 6.7 Obligations
 
-An obligation contains a versioned `type` and profile-defined parameters. Candidate obligation types include:
+An obligation contains a versioned `type`, a `critical` flag, and profile-defined parameters.
 
-- rate or concurrency limit;
-- action, route, or resource restriction;
-- maximum result, quantity, or value;
-- one-time execution;
-- idempotency requirement;
-- mandatory application authentication;
-- step-up before a named later action; and
-- audit-record requirement.
+`critical` defaults to `true`. If an enforcement point cannot interpret and enforce a critical obligation, it MUST reject or narrow the request. If it cannot enforce a non-critical obligation, it MUST ignore that obligation and MUST NOT treat the remainder as a broader permission than the enforceable subset allows.
 
-The enforcement point MUST reject or narrow an `allow_with_obligations` decision if it cannot interpret and enforce every required obligation.
+Draft `0.1` core obligation types are critical by default:
+
+- `urn:agent-clearance:obligation:rate-limit:0.1`
+- `urn:agent-clearance:obligation:maximum-results:0.1`
+- `urn:agent-clearance:obligation:one-time:0.1`
+- `urn:agent-clearance:obligation:action-restriction:0.1`
+- `urn:agent-clearance:obligation:step-up-before:0.1`
+
+See [vocabulary/obligations.md](vocabulary/obligations.md). Origins that emit types outside this core SHOULD mark them `critical` unless a partial enforcement point can safely ignore them. The core exists so a first middleware implementation can interoperate; it is not a complete obligation language.
 
 ### 6.8 Clearance artifact
 
@@ -229,7 +266,7 @@ An optional clearance artifact MUST be:
 - revocable or tightly time-bounded; and
 - unusable as a cross-origin trust badge.
 
-The artifact format is not selected in draft `00`.
+The prototype format is an origin-signed JSON object transported as the `value` of the decision's `clearance_artifact`. The retry MUST prove possession of `key_confirmation` using the HTTP Message Signatures profile.
 
 ## 7. Processing rules
 
@@ -248,12 +285,12 @@ The origin:
 
 The agent or harness:
 
-1. Verifies the challenge origin, expiry, and intended action.
+1. Verifies the challenge origin, expiry, presentation endpoint, and intended action.
 2. Rejects unsupported, excessive, or unauthorized disclosure requirements.
 3. Selects one acceptable profile for each required evidence class.
 4. Obtains current approval or evidence when necessary.
 5. Builds a presentation bound to the challenge and request.
-6. Signs using a key that is also bound to sender-constrained evidence where required.
+6. POSTs the presentation to `presentation_endpoint` using a key that is also bound to sender-constrained evidence where required.
 
 The agent SHOULD make requested disclosures inspectable to the represented principal when practical.
 
@@ -267,18 +304,20 @@ The verifier:
 2. Validates protocol version and critical fields.
 3. Validates challenge state, origin, nonce, and expiry.
 4. Reconstructs and compares the request binding.
-5. Verifies presenter proof and proof-of-possession relationships.
+5. Verifies the presentation HTTP signature and proof-of-possession relationships.
 6. Validates each evidence profile, issuer trust, and revocation state.
 7. Emits facts with provenance and warnings.
 8. Marks one-time state atomically before or with enforcement where needed.
 
 Unknown critical fields or requirement semantics MUST cause safe rejection for this draft.
 
+The draft `0.1` presentation body limit is 65,536 bytes. Duplicate requirement identifiers and evidence envelopes not requested by the challenge are rejected; they are not collapsed, ignored, or copied into logs.
+
 ### 7.4 Policy and enforcement
 
 The origin combines verified facts with local context. An AgentIsOK implementation MUST NOT replace an origin's policy with an issuer or vendor-global verdict.
 
-The enforcement point verifies that the decision matches the current request digest and policy context, applies all obligations, and prevents duplicate action execution.
+The enforcement point verifies that the decision matches the current request digest and policy context, applies all critical obligations, and prevents duplicate action execution.
 
 ### 7.5 Step-up
 
@@ -290,11 +329,15 @@ Origins define risk-tiered behavior for `indeterminate`. A failure MUST NOT be c
 
 ## 8. Candidate HTTP binding
 
-This section is non-normative and exists to support a first implementation.
+This section is the prototype binding. Names are unregistered. It exists so a first implementation can be written without inventing a second private protocol.
+
+The prototype uses **detached presentation** rather than attaching rich evidence to the original request. That costs extra round trips compared with Web Bot Auth. It is the correct cost for a CAPTCHA-shaped challenge that carries a mandate. Web Bot Auth remains a request-integrity profile, not a substitute for this exchange.
+
+Do not mix this binding with a second JSON-embedded presentation signature. Parser differentials follow immediately.
 
 ### 8.1 Discovery
 
-A prototype may expose an HTTPS configuration resource at:
+A prototype MAY expose an HTTPS configuration resource at:
 
 ```text
 /.well-known/agent-clearance
@@ -302,42 +345,80 @@ A prototype may expose an HTTPS configuration resource at:
 
 The path is not registered. Production standardization would require the applicable IANA and HTTP review.
 
-The resource can advertise protocol versions, challenge endpoint patterns, evidence profiles, signing keys, and size limits. Fetches require TLS and conservative cache rules.
+The resource advertises protocol versions, the presentation endpoint, supported evidence profiles, HTTP signature algorithms, and size limits. Fetches require TLS. Responses may be cached with conservative `max-age`, but challenge objects themselves are not cacheable.
+
+See [schema/discovery.schema.json](schema/discovery.schema.json).
 
 ### 8.2 Challenge response
 
-When an otherwise protected request requires clearance, a prototype may return `403 Forbidden` with a JSON challenge and `Cache-Control: no-store`.
+When an otherwise protected request requires clearance, the origin returns `401 Unauthorized` with:
+
+- `WWW-Authenticate: AgentClearance` carrying at least `challenge_id` and `profile`;
+- `Content-Type: application/agent-clearance-challenge+json`;
+- `Cache-Control: no-store`; and
+- the challenge object as the JSON body.
 
 ```http
-HTTP/1.1 403 Forbidden
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: AgentClearance profile="agent-clearance-0.1", challenge_id="urn:uuid:0d191f2f-73ae-4d41-b662-e1f45a968762"
 Content-Type: application/agent-clearance-challenge+json
 Cache-Control: no-store
 
 { ...challenge... }
 ```
 
-The media type is provisional and unregistered. The response should also retain an ordinary human or application-auth path where appropriate.
+`401` is used because this is an authentication-shaped challenge, not an application authorization failure. Origins SHOULD still provide an ordinary human or application-auth path. That path MAY be another `WWW-Authenticate` challenge, an HTML body for browsers, or both.
+
+`403 Forbidden` is reserved for an affirmative `deny` after evaluation, not for issuing the initial challenge.
+
+The media type and scheme name are provisional and unregistered.
 
 ### 8.3 Presentation endpoint
 
-The agent POSTs the presentation to the challenge's `response_uri`. The HTTP request is signed using an evidence profile such as RFC 9421 HTTP Message Signatures and covers at least:
+The agent POSTs the presentation JSON to `presentation_endpoint`. The HTTP request is signed using the HTTP Message Signatures profile and covers at least:
 
 - `@method`;
 - `@authority`;
-- `@path` or a profile-approved target component;
-- creation and expiration parameters;
-- content type;
-- content digest;
-- challenge identifier; and
-- nonce or a digest that commits to it.
+- `@path`;
+- `@query` when the presentation URL has a query;
+- `content-digest`;
+- `content-type`;
+- `created` and `expires`;
+- `keyid`;
+- `alg`;
+- `nonce` equal to the challenge nonce; and
+- `tag="agent-clearance"`.
 
-The exact covered-component profile and header carrying challenge context remain to be specified.
+The presentation body is the JSON object in [Section 6.4](#64-presentation). It does not repeat the HTTP signature.
+
+The origin MUST reject a presentation POST that is not signed under an accepted `request_integrity` profile, even if embedded evidence looks valid.
 
 ### 8.4 Decision and retry
 
-The presentation endpoint returns a decision. On success it may include a short-lived sender-constrained clearance artifact. The agent retries the protected request with that artifact and a request proof.
+The presentation endpoint returns `200` with `Content-Type: application/agent-clearance-decision+json` on a completed evaluation, including `deny` and `indeterminate`. Transport success is not application success.
 
-The candidate authorization scheme name and artifact syntax are deliberately unset pending review of HTTP authentication semantics and existing registrations.
+On `allow` or `allow_with_obligations` the origin MAY include a short-lived sender-constrained clearance artifact. The agent retries the protected request with:
+
+```http
+Authorization: AgentClearance artifact="<artifact-value>"
+```
+
+and an HTTP Message Signature proving possession of the confirmed presenter key, covering the original protected request's method, authority, path, query if present, and content digest if the body affects authorization.
+
+Malformed presentations return `400`. Unauthenticated presentation POSTs return `401`. The origin MUST NOT perform the protected application action as a side effect of handling a presentation.
+
+### 8.5 Why this shape
+
+| Choice | Reason |
+|---|---|
+| `401` + `WWW-Authenticate` | HTTP authentication challenge, composable with a human path |
+| Challenge in the body | Challenge objects are too large and structured for a header |
+| Single presentation endpoint | Avoids per-challenge URL state, open redirects, and cache confusion |
+| Detached presentation | Mandates and selective disclosure do not belong in the original request body |
+| RFC 9421 on the presentation POST | One proof layer; no nested JSON signature |
+| Artifact on retry | Keeps verification off the application action path |
+
+Exact request canonicalization through CDNs remains an open issue. The first profile therefore covers a conservative component set and treats rewritten queries, redirected hosts, and unsigned bodies as out of scope for `0.1`.
 
 ## 9. Evidence profile requirements
 
@@ -371,17 +452,25 @@ Identifiers should be decentralized where possible. Any common registry must fol
 
 - Challenges reveal origin policy and may fingerprint routes; disclose only necessary requirements.
 - Stable presenter keys can correlate activity; profiles should support origin-specific keys or pseudonyms where feasible.
-- Issuers should not learn destinations unless necessary.
+- Presented key identifiers MUST NOT include the relying origin as a correlatable join key.
+- Issuers should not learn destinations unless necessary. The `0.1` mandate issuer is the origin, which avoids a third-party destination dossier.
 - Origins should not receive civil identity when an attribute or scoped pseudonym suffices.
 - Natural-language tasks should not enter protocol messages or default logs.
 - Diagnostic reasons must not expose private claims.
 - Outcome sharing is a separate consented action, not an automatic consequence of clearance.
+- A TLS-terminating CDN or reverse proxy sees the presentation in plaintext. Draft `0.1` is scoped disclosure to the origin (and whoever terminates HTTPS), not unlinkability from the edge.
+
+Boolean evidence negotiation without fingerprinting remains unsolved. Listing acceptable issuers in a challenge can leak policy. The `0.1` profiles accept that leak for a first origin-scoped mandate and treat a Privacy Pass-style rate proof as future work rather than a fake solution.
 
 ## 12. Security considerations
 
 Implementers must address the complete [threat model](../THREAT-MODEL.md), particularly replay, concurrent redemption, signature coverage, intermediary transformations, key substitution, revocation, delegation attenuation, obligation enforcement, parser differentials, resource exhaustion, and fail-open behavior.
 
 A valid signature proves control of a key over covered data. It does not prove that the signer is benign, the issuer is honest, the principal's intent is current, or the action is permitted.
+
+The prototype replay store is origin-local and single-node. Distributed edge replay is a centralization risk if it requires a hosted nonce service. That store is an observation MITM for presenter/origin/time even when signatures verify locally. Deployments MUST document their consistency model before using one-time proofs at more than one enforcement point.
+
+A deployment is origin-authoritative only if the origin can verify the same presentation bytes with its own keys and policy. An edge that verifies and forwards a header, or a vendor API that classifies the agent, is a hosted verifier. Edge MAY enforce. It MUST NOT be the only party that saw the proof.
 
 ## 13. Interoperability and anti-capture requirements
 
@@ -396,28 +485,40 @@ Before the protocol is described as mature, the project should demonstrate:
 
 No normative step may depend on an AgentIsOK account, API key, proprietary allowlist, private conformance server, or exclusive registry.
 
+This repository contains one reference verifier/responder and two evidence profiles. That is not protocol maturity.
+
 ## 14. Open issues
 
+Decided for the `0.1` prototype, still unregistered and reversible:
+
+1. Candidate HTTP status is `401` with `WWW-Authenticate` and a JSON challenge body.
+2. Proof is the presentation request's HTTP Message Signature, not a second JSON signature.
+3. Presentation URLs are origin-global, not per-challenge.
+4. Core obligations are critical by default; unknown critical obligations fail closed.
+5. The protocol is not abbreviated ACP.
+
+Still open:
+
 1. Final protocol name and identifier namespace.
-2. Correct HTTP status, authentication framework, headers, and media types.
+2. IANA registration of scheme, headers, media types, and well-known path.
 3. Discovery and downgrade-resistant version negotiation.
 4. Exact request canonicalization and intermediary profile.
 5. Challenge state: server-side, self-contained, or both.
-6. Detached presentation versus signed retry tradeoffs.
-7. Clearance artifact format and sender constraint.
-8. Boolean evidence requirements and selective disclosure negotiation.
-9. Obligation registry and composition semantics.
-10. Pairwise key and identifier mechanisms.
-11. Distributed replay-state guarantees.
-12. Privacy-preserving per-principal rate limits.
-13. Revocation freshness by action risk.
-14. Error disclosure and recourse semantics.
-15. Migration path to a vendor-neutral standards registry.
+6. Clearance artifact format beyond the prototype JSON object.
+7. Boolean evidence requirements and selective disclosure negotiation.
+8. Obligation registry beyond the core five types.
+9. Pairwise key and identifier mechanisms.
+10. Distributed replay-state guarantees.
+11. Privacy-preserving per-principal rate limits.
+12. Revocation freshness by action risk.
+13. Error disclosure and recourse semantics.
+14. Migration path to a vendor-neutral standards registry.
 
 ## 15. References
 
 - [RFC 9421: HTTP Message Signatures](https://www.rfc-editor.org/rfc/rfc9421)
 - [RFC 9530: Digest Fields](https://www.rfc-editor.org/rfc/rfc9530)
+- [RFC 8785: JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785)
 - [RFC 9449: OAuth 2.0 Demonstrating Proof of Possession](https://www.rfc-editor.org/rfc/rfc9449)
 - [RFC 9396: OAuth 2.0 Rich Authorization Requests](https://www.rfc-editor.org/rfc/rfc9396)
 - [RFC 8693: OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693)

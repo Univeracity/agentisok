@@ -4,6 +4,18 @@ AgentIsOK welcomes implementation, protocol, security, privacy, accessibility, a
 
 The project is pre-alpha. Early participation should challenge assumptions and produce interoperability evidence rather than rush unreviewed code into production.
 
+## Running the reference loop
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -e "./reference[test]"
+pytest -q reference/tests
+agent-clearance-conformance
+```
+
+Regenerate signed examples and vectors after a protocol or profile change with `agent-clearance-generate`.
+
 ## Before contributing
 
 Read:
@@ -12,16 +24,17 @@ Read:
 - [SCOPE.md](SCOPE.md);
 - [ARCHITECTURE.md](ARCHITECTURE.md);
 - [THREAT-MODEL.md](THREAT-MODEL.md);
-- [IPR-POLICY.md](IPR-POLICY.md); and
-- [GOVERNANCE.md](GOVERNANCE.md).
+- [IPR-POLICY.md](IPR-POLICY.md);
+- [GOVERNANCE.md](GOVERNANCE.md); and
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 Security vulnerabilities follow [SECURITY.md](SECURITY.md), not the public issue process.
 
 ## Ways to participate
 
-- Describe a real origin workflow where desirable agents are blocked or challenged.
+- Describe a real origin workflow where desirable agents are blocked or challenged. A useful report names the action, the current control, how you tell desirable from abusive traffic, and whether a shadow evaluation (old control still decides) is possible on a path the origin controls.
 - Review challenge, evidence, privacy, decision, and obligation semantics.
-- Add protocol examples or negative conformance vectors.
+- Add protocol examples or negative conformance vectors and run `agent-clearance-conformance`.
 - Implement an independent origin verifier or agent responder.
 - Design an adapter for an existing evidence profile.
 - Test intermediary, replay, revocation, and concurrency behavior.
@@ -41,7 +54,7 @@ Open an issue before a large protocol change. Include:
 6. Backward-compatibility and versioning effects.
 7. How at least two independent implementations could support the change.
 
-Protocol pull requests should update the specification, schemas, examples, conformance vectors, threat model, and whitepaper where relevant.
+Protocol pull requests should update the specification, profiles, schemas, examples, conformance vectors, threat model, and whitepaper where relevant. Regenerated examples and vectors must come from `agent-clearance-generate` after a semantic change.
 
 ## Pull requests
 
@@ -86,7 +99,7 @@ Maintainers may request design discussion or an implementation experiment before
 
 ## Conduct
 
-Participate respectfully and focus criticism on ideas, behavior, evidence, and system effects. Harassment, discrimination, threats, deliberate exposure of private information, and sustained disruption are not acceptable.
+Participate respectfully and focus criticism on ideas, behavior, evidence, and system effects. The [code of conduct](CODE_OF_CONDUCT.md) applies. Harassment, discrimination, threats, deliberate exposure of private information, and sustained disruption are not acceptable.
 
 Technical disagreement is expected. Good-faith objections—especially about safety, privacy, accessibility, market power, or implementation feasibility—must not be dismissed as disloyalty to the project.
 

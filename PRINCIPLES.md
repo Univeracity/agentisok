@@ -32,7 +32,7 @@ Payment, legal agreement, healthcare consent, physical control, and other high-i
 
 ## 5. No mandatory gatekeeper
 
-No conforming origin or agent should be required to use one vendor, registry, directory, issuer, control plane, or hosted verifier.
+No conforming origin or agent should be required to use one vendor, registry, directory, issuer, control plane, or hosted verifier. An edge that is the only party able to verify a presentation is a hosted verifier, whatever hostname appears on the wire.
 
 The standard must support:
 
@@ -76,7 +76,7 @@ An explicit denial, insufficient evidence, malformed input, policy error, and un
 
 ## 11. Obligations are enforceable
 
-`allow_with_obligations` is authorization only when a policy enforcement point can apply every required rate, quantity, scope, logging, or step-up constraint. Failure to enforce an obligation must stop or narrow the action.
+`allow_with_obligations` is authorization only when a policy enforcement point can apply every *critical* rate, quantity, scope, logging, or step-up constraint. Unknown critical obligations fail closed. Failure to enforce a required obligation must stop or narrow the action.
 
 ## 12. Compose established standards
 

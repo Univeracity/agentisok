@@ -1,0 +1,17 @@
+name = "agent-clearance-shadow"
+main = "src/cloudflare-worker.ts"
+compatibility_date = "2026-09-03"
+
+[vars]
+ORIGIN_BASE_URL = "https://origin.example"
+DEPLOYMENT_ID = "origin-pilot"
+SAMPLE_PROBABILITY = "0.01"
+EVALUATION_TIMEOUT_MS = "250"
+
+[[services]]
+binding = "SHADOW_EVALUATOR"
+service = "origin-controlled-agent-clearance-evaluator"
+
+[[services]]
+binding = "SHADOW_METRICS"
+service = "origin-controlled-shadow-metrics"

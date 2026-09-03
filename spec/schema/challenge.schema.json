@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Univeracity/agentisok/blob/main/spec/schema/challenge.schema.json",
+  "$id": "https://agentisok.org/spec/0.1/challenge.schema.json",
   "title": "Agent Clearance Challenge",
   "description": "Exploratory AgentIsOK challenge object; not production-ready.",
   "type": "object",
@@ -15,7 +15,7 @@
     "evidence_requirements",
     "policy",
     "privacy",
-    "response_uri"
+    "presentation_endpoint"
   ],
   "properties": {
     "protocol_version": {
@@ -31,10 +31,7 @@
       "pattern": "^[A-Za-z0-9_-]{22,256}$"
     },
     "origin": {
-      "type": "string",
-      "format": "uri",
-      "pattern": "^https://",
-      "maxLength": 2048
+      "$ref": "#/$defs/origin"
     },
     "created_at": {
       "type": "string",
@@ -61,7 +58,7 @@
     "privacy": {
       "$ref": "#/$defs/privacy"
     },
-    "response_uri": {
+    "presentation_endpoint": {
       "type": "string",
       "format": "uri",
       "pattern": "^https://",
@@ -70,6 +67,11 @@
   },
   "additionalProperties": false,
   "$defs": {
+    "origin": {
+      "type": "string",
+      "pattern": "^https://[A-Za-z0-9.-]+(:[1-9][0-9]{0,4})?$",
+      "maxLength": 253
+    },
     "requestBinding": {
       "type": "object",
       "required": ["method", "target_uri", "action"],
@@ -87,27 +89,31 @@
         },
         "content_digest": {
           "type": "string",
+          "pattern": "^sha-256=:[A-Za-z0-9+/=]+:$",
           "maxLength": 512
         },
         "action": {
+          "$ref": "#/$defs/action"
+        }
+      },
+      "additionalProperties": false
+    },
+    "action": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.:-]{0,127}$"
+        },
+        "resource": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "constraints": {
           "type": "object",
-          "required": ["type"],
-          "properties": {
-            "type": {
-              "type": "string",
-              "pattern": "^[a-z][a-z0-9_.:-]{0,127}$"
-            },
-            "resource": {
-              "type": "string",
-              "maxLength": 1024
-            },
-            "constraints": {
-              "type": "object",
-              "maxProperties": 32,
-              "additionalProperties": true
-            }
-          },
-          "additionalProperties": false
+          "maxProperties": 32,
+          "additionalProperties": true
         }
       },
       "additionalProperties": false

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Univeracity/agentisok/blob/main/spec/schema/decision.schema.json",
+  "$id": "https://agentisok.org/spec/0.1/decision.schema.json",
   "title": "Agent Clearance Decision",
   "description": "Exploratory AgentIsOK origin decision; not production-ready.",
   "type": "object",
@@ -31,6 +31,7 @@
     },
     "request_binding_digest": {
       "type": "string",
+      "pattern": "^sha-256=:[A-Za-z0-9+/=]+:$",
       "maxLength": 512
     },
     "evaluated_at": {
@@ -86,6 +87,66 @@
     }
   },
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "allow"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "obligations": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "allow_with_obligations"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "obligations": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "step_up"
+          }
+        }
+      },
+      "then": {
+        "required": ["continuation_uri"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "enum": ["deny", "indeterminate"]
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": ["clearance_artifact"]
+        }
+      }
+    }
+  ],
   "$defs": {
     "obligation": {
       "type": "object",
@@ -95,6 +156,10 @@
           "type": "string",
           "format": "uri",
           "maxLength": 512
+        },
+        "critical": {
+          "type": "boolean",
+          "default": true
         },
         "parameters": {
           "type": "object",
@@ -138,6 +203,8 @@
         },
         "key_confirmation": {
           "type": "string",
+          "format": "uri",
+          "pattern": "^https://",
           "maxLength": 1024
         }
       },

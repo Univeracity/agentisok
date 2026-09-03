@@ -1,0 +1,90 @@
+{
+  "protocol_version": "0.1",
+  "vectors": [
+    {
+      "id": "positive.availability-search",
+      "file": "positive/availability-search.json",
+      "expect": "allow_with_obligations"
+    },
+    {
+      "id": "negative.replay-nonce",
+      "file": "negative/replay-nonce.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.expired-challenge",
+      "file": "negative/expired-challenge.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.wrong-audience",
+      "file": "negative/wrong-audience.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.binding-mismatch",
+      "file": "negative/binding-mismatch.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.mandate-scope",
+      "file": "negative/mandate-scope.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.expired-mandate",
+      "file": "negative/expired-mandate.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.missing-mandate",
+      "file": "negative/missing-mandate.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.excessive-quantity",
+      "file": "negative/excessive-quantity.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.unsupported-obligation",
+      "file": "negative/unsupported-obligation.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.untrusted-issuer",
+      "file": "negative/untrusted-issuer.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.indeterminate-revocation",
+      "file": "negative/indeterminate-revocation.json",
+      "expect": "indeterminate"
+    },
+    {
+      "id": "negative.expired-signature",
+      "file": "negative/expired-signature.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.future-signature",
+      "file": "negative/future-signature.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.missing-signature-coverage",
+      "file": "negative/missing-signature-coverage.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.duplicate-evidence",
+      "file": "negative/duplicate-evidence.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.unrequested-evidence",
+      "file": "negative/unrequested-evidence.json",
+      "expect": "deny"
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 ## Current status
 
-AgentIsOK is pre-alpha design and interoperability work. The protocol and examples are incomplete, have not received an independent security assessment, and must not be used to authorize production actions.
+AgentIsOK is pre-alpha design and interoperability work. The protocol, profiles, reference loop, and examples are incomplete, have not received an independent security assessment, and must not be used to authorize production actions.
 
 There are currently no supported production versions.
 
@@ -10,9 +10,15 @@ There are currently no supported production versions.
 
 Do not open a public issue for a vulnerability that could create exploitation risk.
 
-Once private vulnerability reporting is enabled, use the reporting flow from the repository's **Security** tab. If that option is unavailable, contact a repository maintainer privately through the Univeracity organization to establish a secure reporting channel before sending sensitive details.
+Once the repository is public, use GitHub private vulnerability reporting from the repository **Security** tab. GitHub does not expose that reporting feature while a repository remains private.
 
-Before changing the repository to public visibility, maintainers must enable private vulnerability reporting and verify that the reporting link works for a non-collaborator. GitHub does not expose that reporting feature while this repository remains private.
+Before changing the repository to public visibility, maintainers must:
+
+1. Enable private vulnerability reporting.
+2. Verify that a non-collaborator can open an advisory.
+3. List any additional contact path in [MAINTAINERS.md](MAINTAINERS.md).
+
+Until then, contact a repository maintainer privately through the Univeracity GitHub organization to establish a secure reporting channel before sending sensitive details.
 
 Include when possible:
 
@@ -39,7 +45,7 @@ Because the project is new and volunteer capacity may vary, this document does n
 
 ## Security design work
 
-Non-embargoed design weaknesses belong in public issues and should update [THREAT-MODEL.md](THREAT-MODEL.md), the protocol specification, and conformance vectors together.
+Non-embargoed design weaknesses belong in public issues and should update [THREAT-MODEL.md](THREAT-MODEL.md), the protocol specification, profiles, and conformance vectors together.
 
 Particularly useful reviews include:
 

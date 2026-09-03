@@ -1,0 +1,15 @@
+{
+  "protocol_versions": [
+    "0.1"
+  ],
+  "presentation_endpoint": "https://travel.example/.well-known/agent-clearance/presentations",
+  "evidence_profiles": [
+    "urn:agent-clearance:profile:http-message-signatures:rfc9421:0.1",
+    "urn:agent-clearance:profile:origin-scoped-mandate:0.1"
+  ],
+  "http_signature_algs": [
+    "ed25519"
+  ],
+  "max_body_bytes": 65536,
+  "mandate_issuer_key_id": "https://travel.example/.well-known/agent-clearance/keys/mandate-issuer"
+}

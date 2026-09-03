@@ -85,7 +85,7 @@ Every transition across a boundary requires explicit validation and policy.
 
 ### Capability advertisement
 
-An origin needs a discoverable way to announce supported protocol versions, challenge profiles, evidence profiles, endpoints, and key material. The first implementation may use a well-known HTTPS resource. Standardization would require formal registration and security review.
+An origin needs a discoverable way to announce supported protocol versions, challenge profiles, evidence profiles, endpoints, and key material. The first implementation uses `/.well-known/agent-clearance` and issues challenges as `401 Unauthorized` with `WWW-Authenticate: AgentClearance` and a JSON body. Standardization would require formal registration and security review. DID resolution is not a prerequisite; prototype key identifiers are HTTPS URLs.
 
 ### Challenge issuer
 
@@ -115,7 +115,7 @@ The engine accepts facts and origin-local context and emits one typed decision:
 - `deny`; or
 - `indeterminate`.
 
-Policy language is deliberately not standardized in the initial protocol. The input and output contracts are the interoperability boundary.
+Unknown critical obligations fail closed. Policy language is deliberately not standardized in the initial protocol. The input and output contracts are the interoperability boundary.
 
 ### Enforcement adapter
 
@@ -174,20 +174,26 @@ Agent                  Origin/Verifier             Issuers/Metadata
   |                           |                           |
   | protected request         |                           |
   |-------------------------->|                           |
-  | challenge + requirements  |                           |
+  | 401 + challenge           |                           |
   |<--------------------------|                           |
   |                           |                           |
   | obtain/select evidence    |                           |
   |------------------------------------------------------>|
   |<------------------------------------------------------|
   |                           |                           |
-  | signed retry + evidence   |                           |
+  | POST presentation         |                           |
+  | (HTTP Message Signature)  |                           |
   |-------------------------->| verify/revocation ------>|
   |                           |<--------------------------|
-  |                           | local policy + enforcement|
-  | decision or application   |                           |
+  | decision + artifact       |                           |
+  |<--------------------------|                           |
+  | signed retry + artifact   |                           |
+  |-------------------------->| enforce obligations       |
+  | application response      |                           |
   |<--------------------------|                           |
 ```
+
+The presentation HTTP request is the proof. The presentation JSON does not contain a second signature. The presentation URL is an origin-global endpoint, not a per-challenge URL.
 
 Step-up is a new, narrower challenge. It must not be an unstructured instruction to “ask the human.”
 
@@ -205,6 +211,8 @@ A provider distributes policy, adapter, and issuer metadata updates while reques
 
 The origin sends minimized evidence to a hosted verifier and receives facts, then applies local policy. This can simplify adoption but increases confidentiality, availability, and capture risk. It must remain optional and replaceable.
 
+Calling a vendor API to classify an agent, or accepting an edge header as the only proof, is this mode even when it is branded as “local.”
+
 ### Federated evidence ecosystem
 
 Origins select multiple issuers or qualification sources under local policy. Federation cannot become an implicit global allowlist. Trust lists need transparent provenance and practical override.
@@ -218,10 +226,29 @@ The intended building blocks include:
 - [RFC 9449](https://www.rfc-editor.org/rfc/rfc9449) DPoP where OAuth sender-constrained tokens are appropriate;
 - [RFC 9396](https://www.rfc-editor.org/rfc/rfc9396) Rich Authorization Requests for structured authority;
 - [RFC 8693](https://www.rfc-editor.org/rfc/rfc8693) OAuth Token Exchange where delegated token exchange is appropriate;
-- [RFC 9576](https://www.rfc-editor.org/rfc/rfc9576) Privacy Pass architecture as a role-separation and privacy precedent; and
-- [Verifiable Credentials Data Model 2.0](https://www.w3.org/TR/vc-data-model-2.0/) when issuer-holder-verifier credentials add value.
+- [RFC 9576](https://www.rfc-editor.org/rfc/rfc9576) Privacy Pass architecture as a role-separation and privacy precedent;
+- [Verifiable Credentials Data Model 2.0](https://www.w3.org/TR/vc-data-model-2.0/) when issuer-holder-verifier credentials add value; and
+- Web Bot Auth as an optional request-integrity adapter, never as proof of a principal's mandate.
 
 Use of a building block is profile-specific. The core protocol must not imply that all deployments use OAuth, verifiable credentials, or proof of personhood.
+
+## Origin-authoritative verification
+
+Two different middlebox failures have to stay distinct.
+
+**Trust MITM.** An intermediary verifies the agent and tells the origin that the request is fine. The origin never sees a proof it can check.
+
+**Observation MITM.** An intermediary sees destinations, timing, pairwise identifiers, mandates, and outcomes. Even without a global subject identifier, the traffic graph is the identifier.
+
+AgentIsOK is origin-authoritative only when the origin can verify the same presentation bytes with its own keys and policy after any edge. Edge and reverse-proxy components MAY enforce obligations. They MUST NOT be the only party that saw the proof and the only party that can reproduce the decision.
+
+“Origin-local” means the origin’s verifier, not “somewhere in front of the origin.” A TLS-terminating CDN still sees the presentation in plaintext. Draft `0.1` therefore gives the origin scoped disclosure, not unlinkability from the origin’s edge.
+
+A multi-point replay or rate store is an observation surface. If one-time nonces are implemented as a vendor session service, that deployment is a hosted data plane for those facts, even when signatures verify locally.
+
+Presented key identifiers MUST NOT include the relying origin as a correlatable join key. Internal pairwise isolation may still be per-origin; the identifier on the wire should be opaque.
+
+A deployment that only works as a CDN product checkbox does not satisfy this section, however convenient it is.
 
 ## Anti-centralization architecture
 
@@ -231,6 +258,7 @@ Preventing gatekeeper concentration requires technical properties, not only gove
 - no global AgentIsOK identifier;
 - no required proprietary directory;
 - origin-controlled issuer trust;
+- origin reconstruction of the decision from the same presentation bytes, so an edge verdict is never the sole proof;
 - cached and offline-bounded metadata paths;
 - portable policy and configuration formats where feasible;
 - open schemas and conformance vectors;
@@ -246,11 +274,9 @@ AgentIsOK can authorize a bounded external action or transfer. Artifact portabil
 
 ## Implementation sequence
 
-1. Finalize the abstract challenge, evidence, fact, decision, and obligation models.
-2. Build one origin middleware and one agent responder.
-3. Implement request signing, nonce replay protection, and one passkey-backed mandate.
-4. Add two evidence adapters.
-5. Add policy and enforcement adapters for a bounded read workflow.
-6. Publish adversarial vectors and a conformance runner.
-7. Run a shadow evaluation with a qualified origin.
-8. Add an independent verifier implementation before declaring protocol maturity.
+1. Candidate HTTP binding, two evidence profiles, and a reference loop (this repository).
+2. Origin-side discovery of real blocked or challenged agent workflows.
+3. A shadow evaluation with a qualified origin: existing controls still decide, AgentIsOK decisions are compared, and the origin can reconstruct the proof without an edge verdict.
+4. A second independent verifier and responder.
+5. Interoperability events and refinement from observed failures.
+6. Only then: the smallest profile or extension in an established standards venue.

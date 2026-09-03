@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentisok.org/spec/0.1/fact.schema.json",
+  "title": "Agent Clearance Normalized Fact",
+  "description": "Verifier-to-policy fact envelope. Internal to an origin; not a portable credential.",
+  "type": "object",
+  "required": [
+    "claim",
+    "subject",
+    "issuer",
+    "audience",
+    "evidence_profile",
+    "validation"
+  ],
+  "properties": {
+    "claim": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_.-]{0,127}$",
+      "maxLength": 128
+    },
+    "value": true,
+    "subject": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "presenter",
+            "pairwise_principal",
+            "agent_operator",
+            "workload",
+            "issuer"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      },
+      "additionalProperties": false
+    },
+    "issuer": {
+      "type": "string",
+      "maxLength": 1024
+    },
+    "audience": {
+      "type": "string",
+      "pattern": "^https://[A-Za-z0-9.-]+(:[1-9][0-9]{0,4})?$"
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "presenter_key_id": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 1024
+    },
+    "revocation": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "enum": ["not_revoked", "revoked", "unknown"]
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidence_profile": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 512
+    },
+    "evidence_digest": {
+      "type": "string",
+      "pattern": "^sha-256=:[A-Za-z0-9+/=]+:$",
+      "maxLength": 512
+    },
+    "validation": {
+      "enum": ["valid", "valid_with_warnings", "invalid"]
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "type": "string",
+        "maxLength": 256
+      }
+    }
+  },
+  "additionalProperties": false
+}

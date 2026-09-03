@@ -79,6 +79,9 @@ The system should:
 | Step-up phishing | Approval is obtained for a different action | Human-readable structured approval bound to origin, action, limits, and nonce |
 | Parser differential | Implementations interpret evidence differently | Strict schemas, reject duplicates/unknown critical fields, multi-implementation vectors |
 | Resource exhaustion | Expensive verification becomes a denial-of-service vector | Size/count limits, cheap checks first, caching, quotas, bounded algorithms |
+| Trust MITM | An edge or vendor verifies and the origin only sees a header or score | Origin reconstructs the decision from the same presentation bytes; edge enforcement is not a substitute for origin verification |
+| Observation MITM | A TLS terminator, hosted verifier, or shared replay store sees destinations, mandates, and timing | Local data plane; no protocol-critical vendor call; treat shared nonce/rate stores as an activity graph |
+| Key-identifier join key | A pairwise `keyid` encodes the relying origin | Opaque presented key IDs; do not put the origin host in the wire identifier |
 
 ## Delegation and agent threats
 
@@ -114,6 +117,12 @@ A verifier can request unnecessary identity data, retain task histories, or retu
 
 A hosted verifier can leak evidence, falsify facts, or become unavailable. Local verification, evidence digests, signed metadata, provider replacement, and minimized hosted inputs reduce the blast radius.
 
+Accepting a CDN or WAF classification as the only request-integrity result is a hosted verifier, even when no AgentIsOK API is called. The origin must still be able to verify the presentation (or an equivalent Web Bot Auth signature) with its own trust configuration.
+
+### Shared replay and rate state
+
+Atomic nonce and pairwise quota state at many enforcement points requires a consistent store. Whoever operates that store learns that a presenter hit an origin at a time. That is enough to reconstruct a cross-site or cross-route activity graph without a global subject identifier. Single-origin, origin-held replay state is the `0.1` assumption. A vendor nonce service must be documented as observation risk, not as local verification.
+
 ## Privacy threats
 
 | Threat | Impact | Mitigation direction |
@@ -122,12 +131,16 @@ A hosted verifier can leak evidence, falsify facts, or become unavailable. Local
 | Issuer learns destination | Central browsing history | Blind/unlinkable issuance where profiles permit; pre-issued bounded evidence |
 | Origin learns civil identity | Unnecessary exposure and discrimination | Attribute proofs, commitments, pseudonyms, policy minimization |
 | Natural-language task disclosure | Reveals sensitive intent | Structured action classes or hashes |
-| Stable agent key everywhere | Cross-site linkability | Origin-specific keys or privacy-preserving key directories where feasible |
+| Stable agent key everywhere | Cross-site linkability | Origin-specific keys whose *presented* identifiers do not encode the origin |
+| TLS terminator sees presentations | CDN or reverse proxy learns mandates and pairwise IDs | Architecture is scoped disclosure to whoever terminates HTTPS; do not claim unlinkability from the edge |
+| Edge-only verdict | Origin cannot reproduce allow/deny | Origin-authoritative verification: same bytes, origin keys, origin policy |
 | Central outcome collection | Surveillance and breach concentration | Local records; separate, consented, minimized outcome sharing |
 | Diagnostic leakage | Reveals fraud logic or private claims | Stable coarse reason codes, protected detailed logs |
 | Timing and quota correlation | Re-identification across services | Scoped buckets, aggregation, retention limits, privacy review |
 
 Privacy and fraud prevention can conflict. Linkability must be explicit, scoped, and justified rather than hidden inside an allegedly anonymous identifier.
+
+Draft `0.1` privacy is scoped disclosure to the origin, not unlinkability from the origin or its TLS terminator. Origin-issued, origin-audience mandates prevent a third-party issuer from building a destination dossier. They do not hide the presentation from the box that terminates TLS.
 
 ## Availability and operational threats
 

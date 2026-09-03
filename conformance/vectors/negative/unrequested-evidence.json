@@ -1,0 +1,81 @@
+{
+  "id": "negative.unrequested-evidence",
+  "title": "Evidence not requested by the challenge is rejected",
+  "expect": {
+    "decision": "deny",
+    "reason_codes": [
+      "evidence.invalid"
+    ]
+  },
+  "now": "2026-08-31T16:00:31Z",
+  "used_nonces": [],
+  "supported_obligations": null,
+  "fail_closed_on_unknown_revocation": false,
+  "challenge": {
+    "protocol_version": "0.1",
+    "challenge_id": "urn:uuid:0d191f2f-73ae-4d41-b662-e1f45a968762",
+    "nonce": "xW5qjPzVZfR7L2eH9sK4mQ1uB8cD6nT3aY0iO7pE5gA",
+    "origin": "https://travel.example",
+    "created_at": "2026-08-31T16:00:00Z",
+    "expires_at": "2026-08-31T16:02:00Z",
+    "request_binding": {
+      "method": "POST",
+      "target_uri": "https://travel.example/availability/search",
+      "content_digest": "sha-256=:KETbhs/rFCXhpI/rGM+GcjkBRkHDL9Dy6bKrQYiZjhE=:",
+      "action": {
+        "type": "availability.read",
+        "resource": "hotel_inventory",
+        "constraints": {
+          "maximum_results": 100
+        }
+      }
+    },
+    "evidence_requirements": [
+      {
+        "id": "request-proof",
+        "class": "request_integrity",
+        "profiles": [
+          "urn:agent-clearance:profile:http-message-signatures:rfc9421:0.1"
+        ],
+        "required": true,
+        "max_age_seconds": 120,
+        "disclosures": []
+      },
+      {
+        "id": "bounded-mandate",
+        "class": "delegation",
+        "profiles": [
+          "urn:agent-clearance:profile:origin-scoped-mandate:0.1"
+        ],
+        "required": true,
+        "max_age_seconds": 900,
+        "disclosures": [
+          "mandate.action",
+          "mandate.expires_at",
+          "subject.pairwise_id"
+        ]
+      }
+    ],
+    "policy": {
+      "id": "availability-agent-policy",
+      "version": "2026-08-31.1"
+    },
+    "privacy": {
+      "pairwise_subject_required": true,
+      "natural_language_task_forbidden": true,
+      "retention_hint_seconds": 86400
+    },
+    "presentation_endpoint": "https://travel.example/.well-known/agent-clearance/presentations"
+  },
+  "http": {
+    "method": "POST",
+    "url": "https://travel.example/.well-known/agent-clearance/presentations",
+    "headers": {
+      "content-type": "application/agent-clearance-presentation+json",
+      "content-digest": "sha-256=:t4V69Lb7qmEFSTXXeKw/dX+s9e/bSzu9+Gi8JIN2ug8=:",
+      "signature-input": "sig1=(\"@method\" \"@authority\" \"@path\" \"content-digest\" \"content-type\");created=1788192030;expires=1788192120;keyid=\"https://harness.example/keys/k/8f3a1c\";alg=\"ed25519\";nonce=\"xW5qjPzVZfR7L2eH9sK4mQ1uB8cD6nT3aY0iO7pE5gA\";tag=\"agent-clearance\"",
+      "signature": "sig1=:aCdsNsBeD0V2uHX+xJcwmuROIhspvRU4e7Nbq75cOVwN206JHt5RI2b/upQ0IDam2QNUQDVSA7LoskPBnBjkCQ==:"
+    },
+    "body": "{\"challenge_id\":\"urn:uuid:0d191f2f-73ae-4d41-b662-e1f45a968762\",\"created_at\":\"2026-08-31T16:00:30Z\",\"evidence\":[{\"format\":\"embedded\",\"profile\":\"urn:agent-clearance:profile:http-message-signatures:rfc9421:0.1\",\"requirement_id\":\"request-proof\",\"value\":{\"coverage\":\"http-request\",\"signature_label\":\"sig1\"}},{\"format\":\"embedded\",\"profile\":\"urn:agent-clearance:profile:origin-scoped-mandate:0.1\",\"requirement_id\":\"bounded-mandate\",\"value\":{\"actions\":[{\"constraints\":{\"maximum_results\":100},\"resource\":\"hotel_inventory\",\"type\":\"availability.read\"}],\"approval\":{\"displayed\":{\"action\":\"availability.read\",\"expires_at\":\"2026-08-31T16:15:00Z\",\"origin\":\"https://travel.example\",\"presenter_key_id\":\"https://harness.example/keys/k/8f3a1c\",\"resource\":\"hotel_inventory\"},\"method\":\"passkey\"},\"audience\":\"https://travel.example\",\"created_at\":\"2026-08-31T15:50:00Z\",\"expires_at\":\"2026-08-31T16:15:00Z\",\"issuer\":\"https://travel.example\",\"mandate_id\":\"urn:uuid:9c0e2b1a-7d54-4f0e-9a6b-2c8f41d0e7aa\",\"presenter_key_id\":\"https://harness.example/keys/k/8f3a1c\",\"profile\":\"urn:agent-clearance:profile:origin-scoped-mandate:0.1\",\"signature\":{\"alg\":\"ed25519\",\"key_id\":\"https://travel.example/.well-known/agent-clearance/keys/mandate-issuer\",\"value\":\"Ny6NFBgPb2RVgMT93ZOpjowZvO3TpZ1R2KZps--MXuTIYAteYB_WlT1aHec7reOid3jtR3J8GWIjdV5KJ5sIDA\"},\"subject\":{\"id\":\"urn:uuid:43ff2d65-a302-4b52-9f80-f1f3776d8b71\",\"kind\":\"pairwise_principal\"}}},{\"format\":\"embedded\",\"profile\":\"urn:agent-clearance:profile:unrequested:0.1\",\"requirement_id\":\"not-requested\",\"value\":{\"sensitive\":\"must-not-be-accepted-or-logged\"}}],\"presenter\":{\"key_id\":\"https://harness.example/keys/k/8f3a1c\",\"proof_profile\":\"urn:agent-clearance:profile:http-message-signatures:rfc9421:0.1\"},\"protocol_version\":\"0.1\",\"request_binding_digest\":\"sha-256=:N0+hDWB8juNXBUV8A4TUc3icbCWUo/riKz1Xn+NdD14=:\",\"response_id\":\"urn:uuid:1b36ca5d-0499-489e-a4af-04618f4b6871\"}"
+  }
+}

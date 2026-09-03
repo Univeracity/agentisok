@@ -1,0 +1,37 @@
+name: conformance
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install reference tools
+        run: pip install -e "./reference[test]"
+      - name: Tests
+        run: pytest -q reference/tests
+      - name: Conformance vectors
+        run: agent-clearance-conformance
+
+  edge-shadow:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: integrations/typescript-edge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: integrations/typescript-edge/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build and test
+        run: npm test

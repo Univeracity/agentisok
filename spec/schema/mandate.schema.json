@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentisok.org/spec/0.1/mandate.schema.json",
+  "title": "Origin-scoped mandate",
+  "description": "Draft 0.1 mandate object for urn:agent-clearance:profile:origin-scoped-mandate:0.1",
+  "type": "object",
+  "required": [
+    "mandate_id",
+    "profile",
+    "issuer",
+    "audience",
+    "subject",
+    "presenter_key_id",
+    "actions",
+    "created_at",
+    "expires_at",
+    "approval",
+    "signature"
+  ],
+  "properties": {
+    "mandate_id": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 512
+    },
+    "profile": {
+      "const": "urn:agent-clearance:profile:origin-scoped-mandate:0.1"
+    },
+    "issuer": {
+      "$ref": "#/$defs/origin"
+    },
+    "audience": {
+      "$ref": "#/$defs/origin"
+    },
+    "subject": {
+      "type": "object",
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {
+          "const": "pairwise_principal"
+        },
+        "id": {
+          "type": "string",
+          "maxLength": 1024
+        }
+      },
+      "additionalProperties": false
+    },
+    "presenter_key_id": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "maxLength": 1024
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.:-]{0,127}$"
+          },
+          "resource": {
+            "type": "string",
+            "maxLength": 1024
+          },
+          "constraints": {
+            "type": "object",
+            "maxProperties": 32,
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "approval": {
+      "type": "object",
+      "required": ["method", "displayed"],
+      "properties": {
+        "method": {
+          "enum": ["passkey", "out_of_band"]
+        },
+        "displayed": {
+          "type": "object",
+          "required": ["origin", "action", "expires_at", "presenter_key_id"],
+          "properties": {
+            "origin": {
+              "$ref": "#/$defs/origin"
+            },
+            "action": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_.:-]{0,127}$"
+            },
+            "resource": {
+              "type": "string",
+              "maxLength": 1024
+            },
+            "expires_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "presenter_key_id": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://",
+              "maxLength": 1024
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "signature": {
+      "type": "object",
+      "required": ["alg", "key_id", "value"],
+      "properties": {
+        "alg": {
+          "const": "ed25519"
+        },
+        "key_id": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://",
+          "maxLength": 1024
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{64,256}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "origin": {
+      "type": "string",
+      "pattern": "^https://[A-Za-z0-9.-]+(:[1-9][0-9]{0,4})?$",
+      "maxLength": 253
+    }
+  }
+}

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/Univeracity/agentisok/blob/main/spec/schema/presentation.schema.json",
+  "$id": "https://agentisok.org/spec/0.1/presentation.schema.json",
   "title": "Agent Clearance Presentation",
-  "description": "Exploratory AgentIsOK evidence presentation; not production-ready.",
+  "description": "Exploratory AgentIsOK evidence presentation; the HTTP request is the proof.",
   "type": "object",
   "required": [
     "protocol_version",
@@ -11,8 +11,7 @@
     "created_at",
     "request_binding_digest",
     "presenter",
-    "evidence",
-    "proof"
+    "evidence"
   ],
   "properties": {
     "protocol_version": {
@@ -34,6 +33,7 @@
     },
     "request_binding_digest": {
       "type": "string",
+      "pattern": "^sha-256=:[A-Za-z0-9+/=]+:$",
       "maxLength": 512
     },
     "presenter": {
@@ -43,6 +43,7 @@
         "key_id": {
           "type": "string",
           "format": "uri",
+          "pattern": "^https://",
           "maxLength": 1024
         },
         "proof_profile": {
@@ -60,9 +61,6 @@
       "items": {
         "$ref": "#/$defs/evidenceEnvelope"
       }
-    },
-    "proof": {
-      "$ref": "#/$defs/proof"
     }
   },
   "additionalProperties": false,
@@ -95,27 +93,6 @@
               "additionalProperties": true
             }
           ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "proof": {
-      "type": "object",
-      "required": ["profile", "key_id", "value"],
-      "properties": {
-        "profile": {
-          "type": "string",
-          "format": "uri",
-          "maxLength": 512
-        },
-        "key_id": {
-          "type": "string",
-          "format": "uri",
-          "maxLength": 1024
-        },
-        "value": {
-          "type": "string",
-          "maxLength": 65536
         }
       },
       "additionalProperties": false

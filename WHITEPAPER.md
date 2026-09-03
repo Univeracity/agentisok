@@ -113,7 +113,7 @@ The challenge is origin-generated because the origin owns the decision and knows
 
 ### 5.2 Presentation
 
-The agent or harness selects compatible evidence and presents it with proof bound to the challenge and exact request. Where current approval is required, the principal approves a structured description of the origin, action, resource, limits, and expiry—not merely a vague natural-language task.
+The agent or harness selects compatible evidence and POSTs a presentation to the origin's single presentation endpoint. The HTTP request is the proof (HTTP Message Signatures in the first profile). The presentation JSON does not contain a second signature. Where current approval is required, the principal approves a structured description of the origin, action, resource, limits, and expiry—not merely a vague natural-language task.
 
 ### 5.3 Normalized facts
 
@@ -133,7 +133,7 @@ The origin emits one decision:
 
 `challenge` is a protocol state, not a decision. `indeterminate` separates an inability to evaluate safely from an affirmative judgment about an agent.
 
-Obligations are structured and enforceable. Examples include rate limits, maximum results, route restrictions, one-time execution, idempotency, or step-up before a later action. If an enforcement point cannot apply every required obligation, the broader permission is invalid.
+Obligations are structured and enforceable. Core draft types include rate limits, maximum results, action restrictions, one-time execution, and step-up before a later action. Unknown *critical* obligations fail closed. If an enforcement point cannot apply every required critical obligation, the broader permission is invalid.
 
 ### 5.5 Clearance artifact
 
@@ -168,10 +168,14 @@ The architecture should minimize what each role can learn:
 - Keep decision and outcome records local by default.
 - Treat cross-origin outcome sharing as a separate, consented act.
 - Make retention explicit and bounded.
+- Do not treat a TLS-terminating CDN as the origin. Draft `0.1` discloses structured facts to whoever terminates HTTPS.
+- Do not put the relying origin in presented key identifiers.
 
 Fraud defense sometimes benefits from continuity while privacy benefits from unlinkability. The answer should be scoped linkability—for example, a stable pseudonym or rate bucket for one origin—not a concealed universal identifier.
 
-Privacy Pass is particularly important as an architectural precedent because it separates issuance and redemption roles rather than making long-lived identity the default answer to abuse.[^privacy-pass]
+Privacy Pass is particularly important as an architectural precedent because it separates issuance and redemption roles rather than making long-lived identity the default answer to abuse.[^privacy-pass] Draft `0.1` does not implement that split. Origin-issued mandates prevent a third-party issuer dossier; they do not make presentations unlinkable from the origin or its edge.
+
+An edge that verifies and forwards a verdict is a trust MITM. A shared nonce or rate store is an observation MITM. Origin-authoritative means the origin can reproduce the decision from the same presentation bytes.
 
 ## 8. Security model
 
@@ -258,13 +262,13 @@ Agent/harness
     |
     | protected request
     v
-Origin challenge issuer
+Origin challenge issuer  -- 401 + WWW-Authenticate + JSON challenge
     |
     | request-bound challenge
     v
 Agent evidence selection and approval
     |
-    | signed presentation
+    | POST presentation (HTTP Message Signature)
     v
 Origin-side verifier adapters ---> optional issuer metadata/revocation
     |
@@ -272,33 +276,39 @@ Origin-side verifier adapters ---> optional issuer metadata/revocation
     v
 Origin policy decision point
     |
-    | decision + obligations
+    | decision + obligations + optional artifact
     v
 Policy enforcement point ---> application auth and business logic
 ```
 
-The preferred hosted deployment keeps the data plane local. A managed provider can distribute signed adapter, issuer, and policy metadata without observing every request. Fully hosted verification remains possible for convenience but cannot be normative.
+The preferred hosted deployment keeps the data plane local. A managed provider can distribute signed adapter, issuer, and policy metadata without observing every request. Fully hosted verification remains possible for convenience but cannot be normative. A CDN worker that is the only verifier, or a vendor API that classifies the agent, is hosted verification even when no AgentIsOK hostname appears on the wire.
 
 ## 11. The first discriminating implementation
 
-The first proof should protect one low-consequence but bot-sensitive workflow, such as travel, inventory, or appointment availability search.
+The first proof protects one low-consequence but bot-sensitive workflow: availability search.
 
-It should contain:
+This repository now contains a toy version of that loop:
 
-1. A test origin that would ordinarily challenge automation.
-2. An agent responder that signs the exact request.
-3. A fresh, origin-scoped mandate approved through a phishing-resistant user interaction.
+1. A test origin that challenges automation with `401` and a structured challenge.
+2. An agent responder that signs the presentation HTTP request.
+3. An origin-scoped mandate bound to a pairwise subject, presenter key, action, and expiry.
 4. A challenge requesting only structured action facts.
-5. Two evidence profiles or one real profile plus an independently specified adapter.
+5. HTTP Message Signatures for request integrity, plus a Web Bot Auth adapter sketch; the second trust dimension is the mandate.
 6. Local policy returning `allow_with_obligations` for bounded reads.
-7. Atomic replay and quota enforcement.
-8. Step-up before reservation, purchase, or another consequential write.
-9. Logs that omit natural-language tasks and cross-origin identifiers.
-10. Adversarial cases for replay, expiry, revocation, wrong origin, wrong action, excessive scope, concurrency, and outage.
+7. Atomic replay of the challenge nonce.
+8. Step-up before `reservation.commit`.
+9. No natural-language task field in protocol messages.
+10. Negative vectors for replay, expiry, wrong origin, wrong action, excessive scope, missing evidence, untrusted issuer, unenforceable obligations, and indeterminate revocation.
 
-The implementation should first run in shadow mode against the origin's current CAPTCHA or bot decision. Measure authorized completion, false positives, abuse, human step-up, latency, integration effort, support cost, and data disclosure.
+What it does not contain is a qualified origin. The next experiment is a **shadow evaluation**: existing CAPTCHA, WAF, or bot controls still decide; AgentIsOK emits a parallel would-allow / would-limit / would-deny that is logged, not enforced. The origin—not AgentIsOK—judges whether the conversion-to-abuse tradeoff moved.
 
-The decisive result is not “the cryptography worked.” It is that a qualified origin sees desirable agent traffic, improves its conversion-to-abuse tradeoff, and retains the integration.
+A qualified origin has a named bot-sensitive workflow, someone who owns rollback, a way to label good versus abusive traffic after the fact, and a verifier path it controls (origin process or its own proxy, not only a CDN checkbox). The first partner must not be a deployment where the edge is the only party that saw the proof.
+
+Cooperating agents still have to answer the challenge while the old control remains authoritative, or there is nothing to compare. If the experiment only works by logging raw presentations and pairwise identifiers in a vendor cloud, it has failed the privacy test.
+
+Measure authorized completion, false positives, abuse on traffic that would have been allowed, human step-up, latency, integration effort, support cost, and what each party learned. Predefine stop conditions.
+
+The decisive result is not “the cryptography worked.” It is that a qualified origin sees desirable agent traffic, improves its conversion-to-abuse tradeoff, retains the integration, and can still reconstruct the decision without an edge verdict.
 
 ## 12. Adoption strategy
 
@@ -312,7 +322,7 @@ Agent developers receive obvious convenience, but origins bear integration and a
 - less unnecessary identity collection; and
 - one integration surface across multiple agent and evidence providers.
 
-The initial wedge should be edge or origin middleware, not a new browser, universal identity provider, or payment network. The middleware can run beside existing WAF, bot-management, application-auth, and fraud controls.
+The initial wedge should be origin or origin-controlled reverse-proxy middleware, not a new browser, universal identity provider, or payment network. It can run beside existing WAF, bot-management, application-auth, and fraud controls. A TLS-terminating CDN may enforce, but a first design partner that can only install a CDN checkbox cannot test origin-authoritative verification.
 
 Distribution should expand through:
 
@@ -330,27 +340,23 @@ Protocol completeness should follow interoperability evidence, not precede it.
 The proposed sequence is:
 
 1. Publish the problem statement, principles, scope, threat model, and exploratory objects.
-2. Build one end-to-end reference loop.
-3. Add a qualified origin and agent-harness design partner.
-4. Implement two materially different evidence profiles.
+2. Build one end-to-end reference loop with two evidence profiles and negative vectors.
+3. Interview origin operators and recruit a qualified origin design partner.
+4. Run a shadow evaluation on one bounded workflow.
 5. Produce a second independent verifier and responder.
 6. Run public interoperability events and adversarial tests.
 7. Refine ambiguous semantics using observed failures.
 8. Submit the smallest missing profile or extension to the appropriate established standards venue.
 
+Steps 1 and 2 are what this repository currently supports. Step 3 is the remaining scarce asset.
+
 Formal standardization should not make the AgentIsOK brand, service, directory, or reference implementation normative. The technical protocol name should remain descriptive and vendor-neutral.
 
-## 14. Relationship to adjacent open infrastructure
+## 14. Project home
 
-AgentIsOK fits beside two complementary infrastructure questions:
+AgentIsOK is initially stewarded by Univeracity. That is a starting arrangement, not a protocol dependency.
 
-- **AgentIsOK:** May this agent perform this bounded external action here and now?
-- **Limitless Library:** Can completed work or an artifact move safely across tools and environments?
-- **Vyral:** Can the supporting infrastructure operate portably without dependence on one provider?
-
-A clean integration could let AgentIsOK authorize a bounded transfer or reuse while Limitless Library represents the artifact and its provenance, with Vyral supplying portable infrastructure. None should be mandatory for another, and their composition must not create a shared global identity or activity graph.
-
-This is integral positioning rather than lock-in: open components become valuable because they are trusted interoperability points.
+The protocol must remain useful without Univeracity infrastructure, accounts, or sibling projects. Adjacent work on artifact portability or portable hosting may compose with AgentIsOK through explicit interfaces later. None of that is required to issue a challenge, verify a mandate, or enforce an obligation, and composition must not create a shared global identity or activity graph.
 
 ## 15. Limitations and open research
 

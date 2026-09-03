@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentisok.org/spec/0.1/discovery.schema.json",
+  "title": "Agent Clearance Discovery Document",
+  "description": "Prototype /.well-known/agent-clearance resource. Path is unregistered.",
+  "type": "object",
+  "required": [
+    "protocol_versions",
+    "presentation_endpoint",
+    "evidence_profiles",
+    "http_signature_algs",
+    "max_body_bytes"
+  ],
+  "properties": {
+    "protocol_versions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9]+\\.[0-9]+$"
+      }
+    },
+    "presentation_endpoint": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "maxLength": 2048
+    },
+    "evidence_profiles": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "maxLength": 512
+      }
+    },
+    "http_signature_algs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      }
+    },
+    "max_body_bytes": {
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 1048576
+    },
+    "mandate_issuer_key_id": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "maxLength": 1024
+    }
+  },
+  "additionalProperties": false
+}

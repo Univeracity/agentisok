@@ -24,7 +24,7 @@ Anyone participating through issues, reviews, design discussion, documentation, 
 
 ### Maintainers
 
-Contributors trusted to review and merge changes within documented areas. Maintainers are expected to disclose material conflicts, apply the contribution and IPR policies consistently, and prioritize protocol interoperability over implementation advantage.
+Contributors trusted to review and merge changes within documented areas. Maintainers are expected to disclose material conflicts, apply the contribution and IPR policies consistently, and prioritize protocol interoperability over implementation advantage. The current list is [MAINTAINERS.md](MAINTAINERS.md).
 
 ### Stewards
 

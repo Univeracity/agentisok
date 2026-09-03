@@ -1,0 +1,32 @@
+{
+  "name": "@agentisok/edge-shadow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fetch-standard shadow evaluation adapter for Agent Clearance Protocol origin pilots",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "wrangler.example.toml"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test dist/test/*.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "26.4.1",
+    "typescript": "7.0.2",
+    "wrangler": "4.128.0"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=24"
+  }
+}
