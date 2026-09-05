@@ -88,10 +88,12 @@ The pairwise subject identifier MUST be meaningful only at this origin. Implemen
 The challenged `request_binding.action` is covered when a mandate action has:
 
 - the same `type`;
-- the same `resource` if the request names one; and
-- constraints that are at least as tight as the request's constraints.
+- the same `resource`, including whether a resource is present; and
+- the same constraint names, with requested values within the approved bounds.
 
 Unknown action types do not match. `availability.read` does not cover `reservation.commit`. Absence of `constraints` does not mean unlimited; it means no additional attested bound. Origins that need a maximum MUST require it in the challenge and the mandate.
+
+For the prototype's `maximum_results`, both values MUST be positive JSON integers and the requested value MUST be no greater than the approved value. Booleans are not integers. Other constraint values match by exact prototype canonical JSON equality; no numeric ordering is inferred for an unknown constraint. For example, lowering a `minimum_age` is not attenuation. An omitted resource or constraint MUST NOT erase a restriction in the mandate. The bounded-read policy requires an explicit `maximum_results` in both objects; it does not insert a wider default after verification.
 
 Starter action types for the first workflow are listed in [../vocabulary/actions.md](../vocabulary/actions.md). Action types are origin-local unless an origin explicitly adopts the starter list. They are not a global capability ontology.
 
@@ -102,6 +104,8 @@ Starter action types for the first workflow are listed in [../vocabulary/actions
 ## Freshness
 
 Origins SHOULD set `max_age_seconds` on the delegation requirement. The verifier MUST reject a mandate whose `expires_at` is in the past or whose age exceeds `max_age_seconds` when that field is present.
+
+The verifier MUST also reject a future `created_at` or an `expires_at` that is not later than `created_at`. These invalid validity windows return `evidence.invalid` in the prototype; expired or stale mandates return `mandate.expired`.
 
 ## Revocation
 

@@ -25,3 +25,14 @@ A vector passes when the reference origin returns the expected decision and reas
 | `negative.missing-signature-coverage` | `deny` / `evidence.invalid` |
 | `negative.duplicate-evidence` | `deny` / `evidence.invalid` |
 | `negative.unrequested-evidence` | `deny` / `evidence.invalid` |
+| `negative.future-mandate` | `deny` / `evidence.invalid` |
+| `negative.invalid-mandate-window` | `deny` / `evidence.invalid` |
+| `negative.malformed-mandate` | `deny` / `evidence.invalid` |
+| `negative.omitted-constraints` | `deny` / `mandate.scope` |
+| `negative.omitted-resource` | `deny` / `mandate.scope` |
+| `negative.boolean-result-bound` | `deny` / `mandate.scope` |
+| `negative.unknown-constraint-ordering` | `deny` / `mandate.scope` |
+| `negative.endpoint-trailing-slash` | `deny` / `binding.mismatch` |
+| `negative.mislabeled-proof-profile` | `deny` / `evidence.invalid` |
+
+Passing these vectors checks draft behavior against shared fixtures. It does not establish independent interoperability, full RFC 9421 support, safe deployment, or improved outcomes on live traffic. The reference's additional unit tests cover empty trust stores, concurrent nonce consumption within one origin instance, and step-up for an otherwise valid commit mandate.

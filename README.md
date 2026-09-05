@@ -1,20 +1,31 @@
 # AgentIsOK
 
-**A machine-verifiable alternative to CAPTCHA for authorized agents.**
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/brand/agentisok-logo-dark.svg">
+  <img src="assets/brand/agentisok-logo-light.svg" alt="AgentIsOK — gold AI above OK with a green checkmark" width="570">
+</picture>
 
-AgentIsOK lets a website ask an automated agent for bounded evidence about who or what it represents, what it may do, and whether its exact request satisfies the website's policy. The website remains the final decision-maker.
+**Open clearance for authorized agents. Evidence travels. The origin decides.**
 
-```text
-Agent Is OK  ->  A I OK  ->  AI OK
-```
+[![Conformance](https://github.com/Univeracity/agentisok/actions/workflows/conformance.yml/badge.svg)](https://github.com/Univeracity/agentisok/actions/workflows/conformance.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-`AI OK` is always contextual: OK for this action, on this origin, under this policy, at this time. It is not a universal safety label or global trust score.
+AgentIsOK proposes a machine-verifiable alternative to a human CAPTCHA when a website is willing to admit authorized automation. The website asks for bounded evidence about the agent's authority and exact request, then applies its own policy. Ordinary account, abuse, and application controls still apply.
 
-> **Status:** Pre-alpha. There is a candidate HTTP binding, two evidence profiles, a reference loop, and failing negative vectors. The protocol is incomplete, has not received a security review, and must not be used to authorize production actions.
+The name compresses to **AI / OK**. “OK” means OK for this action, on this origin, under this policy, at this time. The logo identifies the project; it is not a safety certification or global trust score.
+
+> **Status: Pre-alpha research prototype.** The candidate protocol, two implemented evidence profiles, reference verifier, and shadow adapter are available. Production enforcement, independent interoperability, and origin outcome evidence are not. This code has not received an independent security review and must not authorize production actions. See [implementation limits](reference/README.md) and [evidence gates](ROADMAP.md).
+
+## Start here
+
+- **Understand the thesis:** [whitepaper](WHITEPAPER.md), especially the [testable claim](WHITEPAPER.md#21-the-testable-claim).
+- **Run the prototype:** [quickstart below](#run-the-reference-loop) or the [edge shadow adapter](integrations/typescript-edge/).
+- **Bring an origin workflow:** [pilot qualification](pilot/README.md) and the [open design-partner call](https://github.com/Univeracity/agentisok/issues/1).
+- **Build or review independently:** [protocol](spec/agent-clearance-protocol.md), [conformance vectors](conformance/), and [contributing](CONTRIBUTING.md).
 
 ## Why this exists
 
-CAPTCHAs were designed for a web where useful visitors were assumed to be human and automated visitors were assumed to be hostile. Agents acting for people and organizations need a legitimate path through that boundary without impersonating humans, inheriting unrestricted credentials, or defeating an origin's controls.
+Human challenges are an awkward interface for agents acting for people and organizations. When existing API access or signed-agent rules are insufficient, those agents need a legitimate path through the automation boundary without impersonating humans or inheriting unrestricted credentials.
 
 AgentIsOK is a challenge and clearance layer:
 
@@ -31,7 +42,7 @@ The central boundary is simple:
 
 > AgentIsOK verifies and composes evidence. The receiving service decides what is OK.
 
-This is not CAPTCHA bypass, and it is not a replacement for Web Bot Auth. Web Bot Auth can recognize a signed agent. AgentIsOK is the challenge, mandate, obligation, and origin-policy layer that recognition does not provide.
+Web Bot Auth addresses automated-client authentication; its [IETF charter](https://datatracker.ietf.org/doc/charter-ietf-webbotauth/) excludes end-user authentication and an intent vocabulary. AgentIsOK explores a complementary challenge, mandate, and obligation contract for origin policy. Its Web Bot Auth adapter remains a sketch, and this repo does not claim interoperability with a deployed Web Bot Auth service.
 
 ## Why it is open
 
@@ -60,11 +71,23 @@ The first discriminating loop is in this repository:
 2. An agent responder signs the presentation HTTP request ([HTTP Message Signatures profile](spec/profiles/http-message-signatures.md)).
 3. It presents an origin-scoped mandate ([mandate profile](spec/profiles/origin-scoped-mandate.md)).
 4. Local policy returns `allow_with_obligations` for the read and requires step-up before `reservation.commit`.
-5. Seventeen conformance vectors cover replay, expiry, signature time and coverage, wrong audience, binding mismatch, excess scope, duplicate or unsolicited evidence, missing evidence, unenforceable obligations, untrusted issuers, and indeterminate revocation.
+5. Twenty-six conformance vectors cover replay, validity windows, malformed mandates, exact request binding, omitted or excessive scope, profile confusion, missing evidence, unenforceable obligations, untrusted issuers, and indeterminate revocation.
 
-Run it:
+| Surface | Implemented today | Still required |
+|---|---|---|
+| Python reference | In-process presentation verification, bounded decisions, test artifact issuance | HTTP serving, artifact redemption, actual rate/result enforcement, production keys and replay storage |
+| Evidence profiles | RFC 9421 subset and origin-scoped test mandates | Approval/issuance integration, live revocation policy, independent security review |
+| TypeScript edge adapter | Sampled comparison, bounded waits, minimized metrics | Origin evaluator with access to the actual signed bytes and challenge state |
+| Conformance | Deterministic fixtures and negative cases | A materially independent verifier and responder |
+| Pilot | Qualification, rollout, and measurement contracts | An origin-owned experiment with independent outcome labels |
+
+### Run the reference loop
+
+Requires Python 3.11+ and a repository checkout. The fixtures use a fixed evaluation time and public test keys; they do not contact an origin or issuer.
 
 ```bash
+git clone https://github.com/Univeracity/agentisok.git
+cd agentisok
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -e "./reference[test]"
@@ -72,11 +95,13 @@ pytest -q reference/tests
 agent-clearance-conformance
 ```
 
-The test is not whether signatures validate. The test is whether an origin can admit desirable agent traffic while preserving or improving its abuse posture and disclosing less sensitive information. That origin evidence does not exist yet.
+Expected conformance summary: `26 passed, 0 failed`. The TypeScript adapter requires Node.js 24+; run `npm ci && npm test` from `integrations/typescript-edge`.
+
+Passing fixtures establishes prototype behavior. The product hypothesis is whether an origin can recover desirable agent traffic within its abuse, privacy, and operating-cost budgets. Shadow mode can estimate decision disagreements; it cannot demonstrate recovered completion while the incumbent still blocks the request. That origin evidence does not exist yet.
 
 ## What to do next
 
-Protocol completeness is not the remaining work. The remaining work is:
+The next work is evidence-driven:
 
 - origin-side discovery: real workflows where legitimate agents are blocked or challenged;
 - one shadow-mode design partner, with existing controls still deciding and the origin able to reconstruct the proof;
@@ -93,6 +118,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Roles, trust boundaries, data flow, and deployment modes |
 | [THREAT-MODEL.md](THREAT-MODEL.md) | Technical, privacy, governance, and ecosystem threats |
 | [WHITEPAPER.md](WHITEPAPER.md) | Motivation, thesis, proposed design, and adoption path |
+| [ROADMAP.md](ROADMAP.md) | Evidence required to advance, reshape, or stop |
 | [spec/agent-clearance-protocol.md](spec/agent-clearance-protocol.md) | Protocol skeleton and candidate HTTP binding |
 | [spec/profiles/](spec/profiles/) | HTTP Message Signatures, origin-scoped mandate, Web Bot Auth adapter |
 | [reference/](reference/) | Prototype origin, responder, and conformance runner |
@@ -105,6 +131,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 | [SECURITY.md](SECURITY.md) | Vulnerability reporting and security status |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Conduct expectations |
 | [MAINTAINERS.md](MAINTAINERS.md) | Current stewardship |
+| [assets/brand/](assets/brand/) | Logo SVGs, PNGs, social preview, and usage guidance |
 
 ## Standards posture
 

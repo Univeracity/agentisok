@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "agent-clearance-ref"
 version = "0.1.0"
 description = "Prototype Agent Clearance Protocol verifier, responder, and conformance runner"
+keywords = ["agentisok", "agents", "authorization", "http-message-signatures"]
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -13,6 +14,11 @@ dependencies = [
   "cryptography>=42",
   "jsonschema>=4.21",
 ]
+
+[project.urls]
+Repository = "https://github.com/Univeracity/agentisok"
+Documentation = "https://github.com/Univeracity/agentisok/blob/main/reference/README.md"
+Issues = "https://github.com/Univeracity/agentisok/issues"
 
 [project.optional-dependencies]
 test = ["pytest>=8"]

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from threading import Lock
 from typing import Any
 from urllib.parse import urlparse
 from uuid import uuid4
@@ -66,17 +67,16 @@ class HttpRequest:
 class Origin:
     now: datetime
     used_nonces: set[str] = field(default_factory=set)
-    presenter_keys: dict[str, Ed25519PublicKey] = field(default_factory=dict)
-    mandate_issuer_keys: dict[str, Ed25519PublicKey] = field(default_factory=dict)
+    presenter_keys: dict[str, Ed25519PublicKey] = field(
+        default_factory=lambda: {PRESENTER_KEY_ID: public_key("presenter")}
+    )
+    mandate_issuer_keys: dict[str, Ed25519PublicKey] = field(
+        default_factory=lambda: {MANDATE_ISSUER_KEY_ID: public_key("mandate-issuer")}
+    )
     supported_obligations: set[str] = field(default_factory=lambda: set(CORE_OBLIGATIONS))
     fail_closed_on_unknown_revocation: bool = False
     max_presentation_bytes: int = 65536
-
-    def __post_init__(self) -> None:
-        if not self.presenter_keys:
-            self.presenter_keys = {PRESENTER_KEY_ID: public_key("presenter")}
-        if not self.mandate_issuer_keys:
-            self.mandate_issuer_keys = {MANDATE_ISSUER_KEY_ID: public_key("mandate-issuer")}
+    _nonce_lock: Any = field(default_factory=Lock, init=False, repr=False, compare=False)
 
     def evaluate(self, challenge: dict[str, Any], request: HttpRequest) -> dict[str, Any]:
         try:
@@ -88,7 +88,7 @@ class Origin:
         except EvaluationError as exc:
             return self._decision(
                 challenge,
-                presentation_digest(request.body) if request.body else challenge_binding_digest(challenge),
+                challenge_binding_digest(challenge),
                 exc.decision,
                 [],
                 [{"code": exc.code}],
@@ -146,13 +146,15 @@ class Origin:
             raise EvaluationError("evidence.invalid", "unexpected presentation content type")
         if int(parse_iso(presentation["created_at"]).timestamp()) != verified["params"]["created"]:
             raise EvaluationError("binding.mismatch", "presentation time does not match HTTP signature")
-        if presentation["presenter"]["proof_profile"] not in {HMS_PROFILE, WBA_PROFILE}:
+        if presentation["presenter"]["proof_profile"] != HMS_PROFILE:
             raise EvaluationError("evidence.invalid", "unsupported proof profile")
 
         nonce = challenge["nonce"]
-        if nonce in self.used_nonces:
-            raise EvaluationError("replay.nonce", "challenge nonce already used")
-        self.used_nonces.add(nonce)
+        # Atomic within this Origin instance; distributed replay is not implemented.
+        with self._nonce_lock:
+            if nonce in self.used_nonces:
+                raise EvaluationError("replay.nonce", "challenge nonce already used")
+            self.used_nonces.add(nonce)
 
         return self._verify_evidence(challenge, presentation, verified["key_id"])
 
@@ -179,7 +181,7 @@ class Origin:
             raise EvaluationError("policy.denied", "action not admitted")
 
         constraints = action.get("constraints", {})
-        maximum_results = constraints.get("maximum_results", 100)
+        maximum_results = constraints.get("maximum_results")
         if type(maximum_results) is not int or maximum_results < 1:
             raise EvaluationError("policy.denied", "maximum_results must be a positive integer")
         obligations = [
@@ -243,7 +245,7 @@ class Origin:
         if request.method.upper() != "POST":
             raise EvaluationError("binding.mismatch", "presentation method must be POST")
         expected = challenge["presentation_endpoint"]
-        if request.url.rstrip("/") != expected.rstrip("/"):
+        if request.url != expected:
             raise EvaluationError("binding.mismatch", "presentation URL mismatch")
 
     def _verify_evidence(
@@ -285,6 +287,8 @@ class Origin:
         presenter_key_id: str,
     ) -> list[dict[str, Any]]:
         value = envelope["value"]
+        if envelope["profile"] != HMS_PROFILE:
+            raise EvaluationError("evidence.invalid", "unsupported request integrity profile")
         if not isinstance(value, dict) or value.get("coverage") != "http-request":
             raise EvaluationError("evidence.invalid", "request integrity must be the HTTP request")
         return [
@@ -312,7 +316,10 @@ class Origin:
         mandate = envelope["value"]
         if not isinstance(mandate, dict):
             raise EvaluationError("evidence.invalid", "mandate must be an object")
-        validate_schema("mandate", mandate)
+        try:
+            validate_schema("mandate", mandate)
+        except ValueError as exc:
+            raise EvaluationError("evidence.invalid", str(exc)) from exc
         if mandate["audience"] != challenge["origin"] or mandate["issuer"] != challenge["origin"]:
             raise EvaluationError("origin.mismatch", "mandate audience is not the challenge origin")
         if mandate["presenter_key_id"] != presenter_key_id:
@@ -322,6 +329,8 @@ class Origin:
                 raise EvaluationError("evidence.invalid", "pairwise subject required")
         expires = parse_iso(mandate["expires_at"])
         created = parse_iso(mandate["created_at"])
+        if expires <= created or created > self.now:
+            raise EvaluationError("evidence.invalid", "invalid mandate validity window")
         if self.now > expires:
             raise EvaluationError("mandate.expired", "mandate has expired")
         max_age = requirement.get("max_age_seconds")
@@ -468,7 +477,7 @@ def _mandate_covers(mandate_actions: list[dict[str, Any]], requested: dict[str, 
     for action in mandate_actions:
         if action.get("type") != requested.get("type"):
             continue
-        if requested.get("resource") and action.get("resource") != requested.get("resource"):
+        if action.get("resource") != requested.get("resource"):
             continue
         if not _constraints_cover(action.get("constraints", {}), requested.get("constraints", {})):
             continue
@@ -477,13 +486,18 @@ def _mandate_covers(mandate_actions: list[dict[str, Any]], requested: dict[str, 
 
 
 def _constraints_cover(approved: dict[str, Any], requested: dict[str, Any]) -> bool:
+    # Omission must not erase a granted bound or introduce an unattested one.
+    if approved.keys() != requested.keys():
+        return False
     for key, value in requested.items():
-        if key not in approved:
-            return False
-        if isinstance(value, (int, float)) and isinstance(approved[key], (int, float)):
-            if value > approved[key]:
+        if key == "maximum_results":
+            if type(value) is not int or type(approved[key]) is not int:
                 return False
-        elif approved[key] != value:
+            if not 1 <= value <= approved[key]:
+                return False
+        # Only the known maximum has ordering semantics. In particular, a
+        # smaller number is not necessarily less authority for other fields.
+        elif canonical_dumps(approved[key]) != canonical_dumps(value):
             return False
     return True
 

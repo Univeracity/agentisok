@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 
 from agent_clearance.fixtures import (
     NOW,
+    CHALLENGE_EXPIRES,
     PRESENTATION_CREATED,
     RESPONSE_ID,
     discovery,
@@ -19,6 +20,7 @@ from agent_clearance.fixtures import (
     protected_request_binding,
 )
 from agent_clearance.responder import build_presentation, sign_mandate, sign_presentation
+from agent_clearance.origin import WBA_PROFILE
 from agent_clearance.schemas import repo_root, validate_schema
 
 
@@ -330,6 +332,48 @@ def main() -> None:
             req,
         )
     )
+
+    # Boundary regressions are portable, signed inputs for other verifiers.
+    boundary_cases: list[tuple[str, str, str, dict[str, Any], dict[str, Any]]] = []
+    future = unsigned_mandate()
+    future["created_at"] = "2026-08-31T16:01:00Z"
+    boundary_cases.append(("future-mandate", "Future-dated mandate is rejected", "evidence.invalid", challenge_object(), future))
+    inverted = deepcopy(future)
+    inverted["expires_at"] = "2026-08-31T16:00:40Z"
+    boundary_cases.append(("invalid-mandate-window", "Inverted mandate validity window is rejected", "evidence.invalid", challenge_object(), inverted))
+    malformed = unsigned_mandate()
+    del malformed["subject"]
+    boundary_cases.append(("malformed-mandate", "Malformed embedded mandate returns deny instead of throwing", "evidence.invalid", challenge_object(), malformed))
+    for field in ("constraints", "resource"):
+        omitted = challenge_object()
+        del omitted["request_binding"]["action"][field]
+        boundary_cases.append((f"omitted-{field}", f"Omitting {field} cannot expand mandate scope", "mandate.scope", omitted, unsigned_mandate(maximum_results=10)))
+    boolean_bound = unsigned_mandate(maximum_results=True)
+    one_result = challenge_object(protected_request_binding(maximum_results=1))
+    boundary_cases.append(("boolean-result-bound", "Boolean is not an integer result bound", "mandate.scope", one_result, boolean_bound))
+    minimum = challenge_object()
+    minimum["request_binding"]["action"]["constraints"]["minimum_age"] = 18
+    approved_minimum = unsigned_mandate()
+    approved_minimum["actions"][0]["constraints"]["minimum_age"] = 21
+    boundary_cases.append(("unknown-constraint-ordering", "Unknown numeric constraint cannot inherit maximum semantics", "mandate.scope", minimum, approved_minimum))
+    for name, title, code, ch, unsigned in boundary_cases:
+        pres = build_presentation(ch, sign_mandate(unsigned), PRESENTATION_CREATED, RESPONSE_ID)
+        req = sign_presentation(ch, pres, created, int(CHALLENGE_EXPIRES.timestamp()))
+        negatives.append(_vector(f"negative.{name}", title, {"decision": "deny", "reason_codes": [code]}, ch, req))
+
+    other_endpoint = challenge_object()
+    other_endpoint["presentation_endpoint"] += "/"
+    pres = build_presentation(other_endpoint, sign_mandate(unsigned_mandate()), PRESENTATION_CREATED, RESPONSE_ID)
+    req = sign_presentation(other_endpoint, pres, created, expires)
+    negatives.append(_vector("negative.endpoint-trailing-slash", "A trailing slash is a different presentation endpoint", {"decision": "deny", "reason_codes": ["binding.mismatch"]}, challenge, req))
+
+    wba_challenge = challenge_object()
+    wba_challenge["evidence_requirements"][0]["profiles"] = [WBA_PROFILE]
+    pres = build_presentation(wba_challenge, sign_mandate(unsigned_mandate()), PRESENTATION_CREATED, RESPONSE_ID)
+    pres["presenter"]["proof_profile"] = WBA_PROFILE
+    pres["evidence"][0]["profile"] = WBA_PROFILE
+    req = sign_presentation(wba_challenge, pres, created, expires)
+    negatives.append(_vector("negative.mislabeled-proof-profile", "Agent Clearance signature cannot claim Web Bot Auth verification", {"decision": "deny", "reason_codes": ["evidence.invalid"]}, wba_challenge, req))
 
     for vector in negatives:
         filename = vector["id"].split(".", 1)[1].replace("_", "-")

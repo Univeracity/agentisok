@@ -4,20 +4,33 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   reference:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python }}
       - name: Install reference tools
         run: pip install -e "./reference[test]"
       - name: Tests
         run: pytest -q reference/tests
       - name: Conformance vectors
         run: agent-clearance-conformance
+      - name: Generated fixtures are current
+        run: |
+          agent-clearance-generate
+          git diff --exit-code -- examples conformance/vectors
+          test -z "$(git ls-files --others --exclude-standard -- examples conformance/vectors)"
+      - name: Public documentation links
+        run: python tools/check_public_docs.py
 
   edge-shadow:
     runs-on: ubuntu-latest

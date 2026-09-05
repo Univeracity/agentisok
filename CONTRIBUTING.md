@@ -16,6 +16,18 @@ agent-clearance-conformance
 
 Regenerate signed examples and vectors after a protocol or profile change with `agent-clearance-generate`.
 
+For the TypeScript shadow adapter (Node.js 24+):
+
+```bash
+cd integrations/typescript-edge
+npm ci
+npm test
+```
+
+From the repository root, run `python3 tools/check_public_docs.py` after documentation or asset changes. This checks that relative links resolve to public repository files, including logo assets. The ignored `docs/` directory contains local working material and is not part of the public documentation.
+
+The [roadmap](ROADMAP.md) identifies the evidence needed next. Passing the repository's tests does not establish production security or independent interoperability.
+
 ## Before contributing
 
 Read:

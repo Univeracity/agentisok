@@ -95,6 +95,10 @@ Mitigations include structured mandates, tool-bound policy enforcement outside m
 
 Convenient wildcard scopes can allow unintended actions. Profiles should prefer explicit action, resource, quantity, duration, and delegation-depth bounds. Origins must not infer broad authority from the mere existence of a mandate.
 
+Omission is also a scope-expansion risk: dropping a resource or result bound must not turn a narrow mandate into a broader read. The reference requires matching constraint names and an explicit positive integer `maximum_results`; only that known maximum has ordering semantics. Unknown numeric fields match exactly, because a smaller number can expand authority. Malformed nested mandates and invalid validity windows produce denial decisions. Empty trust stores remain empty, and a signature cannot claim an evidence profile the verifier did not implement.
+
+The reference consumes a nonce under a lock shared by one `Origin` instance. Separate processes, instances, and restarts do not share this state. A deployment needs durable atomic consumption and expiry management across every verifier that could accept the nonce; the in-memory prototype does not supply that service.
+
 ### Legitimate principal abuse
 
 A real person or organization can authorize spam, scalping, fraud, harassment, or denial of service. Human backing is an accountability signal, not a benignness proof. Origins still need rate, inventory, economic, behavioral, and business controls.

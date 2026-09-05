@@ -85,6 +85,51 @@
       "id": "negative.unrequested-evidence",
       "file": "negative/unrequested-evidence.json",
       "expect": "deny"
+    },
+    {
+      "id": "negative.future-mandate",
+      "file": "negative/future-mandate.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.invalid-mandate-window",
+      "file": "negative/invalid-mandate-window.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.malformed-mandate",
+      "file": "negative/malformed-mandate.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.omitted-constraints",
+      "file": "negative/omitted-constraints.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.omitted-resource",
+      "file": "negative/omitted-resource.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.boolean-result-bound",
+      "file": "negative/boolean-result-bound.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.unknown-constraint-ordering",
+      "file": "negative/unknown-constraint-ordering.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.endpoint-trailing-slash",
+      "file": "negative/endpoint-trailing-slash.json",
+      "expect": "deny"
+    },
+    {
+      "id": "negative.mislabeled-proof-profile",
+      "file": "negative/mislabeled-proof-profile.json",
+      "expect": "deny"
     }
   ]
 }

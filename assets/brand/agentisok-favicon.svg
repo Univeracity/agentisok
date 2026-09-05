@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title description">
+  <title id="title">AgentIsOK</title>
+  <desc id="description">Gold AI and a green check on deep green.</desc>
+  <rect width="64" height="64" rx="14" fill="#10241D"/>
+    <path fill="#E7C46F" fill-rule="evenodd" d="M7 39 17 10H25L35 39H27L25 33H17L15 39ZM19 27H23L21 19Z"/>
+    <path fill="#E7C46F" d="M39 10H47V35H39Z"/>
+    <path d="M29 44 38 51 56 33" fill="none" stroke="#43C995" stroke-width="7"/>
+</svg>

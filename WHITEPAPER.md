@@ -4,6 +4,7 @@
 
 - **Draft:** 0.1
 - **Date:** August 31, 2026
+- **Revised:** September 4, 2026
 - **Authors:** AgentIsOK contributors
 - **Status:** Public working paper; not a production specification or security assessment
 
@@ -69,6 +70,24 @@ trust_score(agent) -> universally_safe
 ```
 
 The protocol therefore treats trust as a request-bound relationship among evidence, authority, policy, and time—not as an attribute possessed by an actor.
+
+### 2.1 The testable claim
+
+The product hypothesis is that, for an origin with desirable automation currently challenged or blocked, explicit delegation and request-bound limits add enough information to improve admission decisions at an acceptable abuse, privacy, and operating cost. A valid signature or a successful demo cannot establish that claim.
+
+The first experiment should compare three policies on the same eligible workflow: the incumbent control, a simpler signed-agent rule with existing account/API authorization where available, and AgentIsOK's request-bound mandate policy. The incremental question is whether the mandate and obligations change useful decisions beyond recognition alone. If the simpler integration meets the origin's goals, a new exchange is unnecessary for that workflow.
+
+Before collecting data, the origin chooses a minimum useful improvement, abuse guardrails, label sources, latency and engineering budgets, and stop conditions. Report label coverage, uncertainty, and the denominator for every rate. Principal-backed traffic is not automatically desirable traffic; outcome labels must have a basis independent of the evidence being evaluated.
+
+Shadow mode estimates disagreements and hypothetical admission of labeled requests. Because existing controls still decide, it cannot establish recovered task completion, prevented abandonment, or abuse after a counterfactual admission. Missing outcomes for blocked requests remain unknown. Any later enforcement experiment needs its own origin approval, controls, and evaluation; shadow success alone is insufficient.
+
+Three outcomes would reshape or stop this approach for the initial workflow: no additional benefit over the simpler baseline; delegation setup costing more than the recovered value; or reproducible origin verification requiring unacceptable disclosure or operational dependence. The [roadmap](ROADMAP.md) turns these questions into evidence gates, not feature-count milestones.
+
+### 2.2 The mandate bootstrap
+
+An origin must have a legitimate basis for issuing or trusting a mandate before the agent can present one. In draft `0.1`, issuance is origin-scoped: a hypothetical origin approval flow binds an existing principal relationship to the agent's key and explicit action limits. The reference uses public fixture keys and a fabricated approval record. It does not implement passkeys, account enrollment, an approval ceremony, key delivery, or proof of current human intent.
+
+The pilot must identify who can issue the mandate, how the principal approves it, and what happens when no mandate or trusted issuer exists. This setup friction belongs in the experiment's cost. A mandate from an unfamiliar origin is not portable authority, and an agent cannot mint its own acceptable delegation merely by signing JSON.
 
 ## 3. Separate the trust dimensions
 
@@ -175,7 +194,7 @@ Fraud defense sometimes benefits from continuity while privacy benefits from unl
 
 Privacy Pass is particularly important as an architectural precedent because it separates issuance and redemption roles rather than making long-lived identity the default answer to abuse.[^privacy-pass] Draft `0.1` does not implement that split. Origin-issued mandates prevent a third-party issuer dossier; they do not make presentations unlinkable from the origin or its edge.
 
-An edge that verifies and forwards a verdict is a trust MITM. A shared nonce or rate store is an observation MITM. Origin-authoritative means the origin can reproduce the decision from the same presentation bytes.
+If an edge forwards only a verdict, the origin depends on the edge's judgment. A shared nonce or rate store can also correlate activity across deployments. Origin-authoritative verification means the origin can reproduce the decision from the same presentation bytes with its own trust configuration and policy. These are deployment trust and disclosure boundaries, including when the intermediary is an authorized service provider.
 
 ## 8. Security model
 
@@ -295,12 +314,14 @@ This repository now contains a toy version of that loop:
 4. A challenge requesting only structured action facts.
 5. HTTP Message Signatures for request integrity, plus a Web Bot Auth adapter sketch; the second trust dimension is the mandate.
 6. Local policy returning `allow_with_obligations` for bounded reads.
-7. Atomic replay of the challenge nonce.
+7. Atomic nonce consumption within one reference `Origin` instance; no shared or durable replay store.
 8. Step-up before `reservation.commit`.
 9. No natural-language task field in protocol messages.
 10. Negative vectors for replay, expiry, wrong origin, wrong action, excessive scope, missing evidence, untrusted issuer, unenforceable obligations, and indeterminate revocation.
 
 What it does not contain is a qualified origin. The next experiment is a **shadow evaluation**: existing CAPTCHA, WAF, or bot controls still decide; AgentIsOK emits a parallel would-allow / would-limit / would-deny that is logged, not enforced. The origin—not AgentIsOK—judges whether the conversion-to-abuse tradeoff moved.
+
+The reference stops at an in-process decision and illustrative artifact issuance. It does not serve the proposed HTTP exchange, redeem an artifact, execute a protected retry, enforce rate or result limits, or complete human step-up. The TypeScript adapter supplies comparison plumbing, not a second verifier. Its header-only Worker example needs an origin-owned path to the signed presentation bytes and stored challenge before it can evaluate real evidence.
 
 A qualified origin has a named bot-sensitive workflow, someone who owns rollback, a way to label good versus abusive traffic after the fact, and a verifier path it controls (origin process or its own proxy, not only a CDN checkbox). The first partner must not be a deployment where the edge is the only party that saw the proof.
 

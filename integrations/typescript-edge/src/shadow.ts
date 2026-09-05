@@ -105,6 +105,7 @@ const EVIDENCE_RESULTS = new Set<EvidenceResult>([
 ]);
 const SAFE_IDENTIFIER = /^[a-z][a-z0-9_.:-]{0,255}$/;
 const BOUNDED_TOKEN = /^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,127}$/;
+const PROFILE_TOKEN = /^[A-Za-z0-9][A-Za-z0-9._:/@+-]{0,511}$/;
 
 export function createShadowHandler<Input>(options: ShadowAdapterOptions<Input>): ShadowHandler {
   const sampleProbability = options.sampleProbability ?? 1;
@@ -163,6 +164,7 @@ export function createShadowHandler<Input>(options: ShadowAdapterOptions<Input>)
     const evaluationPromise = evaluateWithTimeout(
       async (signal) => {
         const input = await options.buildEvaluationInput(selectedRequest, selected);
+        signal.throwIfAborted();
         return options.evaluate(input, signal);
       },
       timeoutMs,
@@ -215,10 +217,22 @@ async function evaluateWithTimeout(
     .then((result) => {
       try {
         validateResult(result);
+        // The evaluator owns its result. Snapshot now, before waiting for the
+        // upstream response, so later mutation cannot bypass this boundary.
+        const snapshot: AgentClearanceResult = Object.freeze({
+          decision: result.decision,
+          reasonCodes: Object.freeze([...result.reasonCodes]),
+          criticalObligations: Object.freeze([...result.criticalObligations]),
+          obligationsEnforceable: result.obligationsEnforceable,
+          evidenceProfiles: Object.freeze([...result.evidenceProfiles]),
+          evidenceResult: result.evidenceResult,
+          verifierVersion: result.verifierVersion,
+          policyVersion: result.policyVersion,
+        });
+        return { result: snapshot, errorClass: "none" as const, latencyMs: elapsed(clock, started) };
       } catch {
         return indeterminate("invalid_result", clock() - started);
       }
-      return { result, errorClass: "none" as const, latencyMs: elapsed(clock, started) };
     }, () => indeterminate("evaluation_error", clock() - started));
 
   const settled = await Promise.race([evaluation, timeout]);
@@ -311,16 +325,19 @@ function validateResult(value: AgentClearanceResult): void {
     throw new TypeError("evaluator returned duplicate result identifiers");
   }
   for (const code of value.reasonCodes) {
-    if (!SAFE_IDENTIFIER.test(code)) {
+    if (typeof code !== "string" || !SAFE_IDENTIFIER.test(code)) {
       throw new TypeError("evaluator returned an unsafe reason code");
     }
   }
   for (const item of [...value.criticalObligations, ...value.evidenceProfiles]) {
-    if (typeof item !== "string" || item.length === 0 || item.length > 512) {
+    if (typeof item !== "string" || !PROFILE_TOKEN.test(item)) {
       throw new TypeError("evaluator returned an invalid identifier");
     }
   }
-  if (!BOUNDED_TOKEN.test(value.verifierVersion) || !BOUNDED_TOKEN.test(value.policyVersion)) {
+  if (
+    typeof value.verifierVersion !== "string" || !BOUNDED_TOKEN.test(value.verifierVersion) ||
+    typeof value.policyVersion !== "string" || !BOUNDED_TOKEN.test(value.policyVersion)
+  ) {
     throw new TypeError("evaluator versions must be bounded structured identifiers");
   }
 }

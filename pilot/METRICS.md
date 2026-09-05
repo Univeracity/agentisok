@@ -92,6 +92,8 @@ Among requests with usable abuse or invalid-action labels, compare the incumbent
 
 An apparent conversion improvement does not justify expansion if the abuse guardrail is crossed.
 
+Pure shadow mode cannot establish abuse non-inferiority after admission: blocked requests may have no observable outcome, and attackers may behave differently once admitted. Report the labeled subset as a hypothetical admission comparison, its selection bias, and the unobserved remainder. Do not classify an unknown blocked outcome as safe. Actual recovery and post-admission abuse require a separately approved experiment.
+
 ### Friction
 
 Measure challenge, step-up, abandonment, and completion rates for eligible flows. In pure shadow mode, AgentIsOK step-up is hypothetical and must be labeled as such.

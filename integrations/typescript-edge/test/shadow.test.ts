@@ -193,3 +193,57 @@ test("a hanging metrics sink is bounded", async () => {
   assert.equal(response.status, 403);
   assert.ok(performance.now() - started < 1_000);
 });
+
+for (const invalid of [
+  { evidenceProfiles: ["https://issuer.example/profile?subject=private"] },
+  { criticalObligations: ["private free-form obligation"] },
+  { reasonCodes: [undefined] },
+  { verifierVersion: undefined },
+]) {
+  test(`rejects unsafe metrics values: ${JSON.stringify(invalid)}`, async () => {
+    const observations: ShadowObservation[] = [];
+    const handler = createShadowHandler({
+      ...baseOptions(observations),
+      evaluate: async () => ({ ...RESULT, ...invalid }) as unknown as AgentClearanceResult,
+    });
+    await handler(new Request("https://travel.example/availability/search"));
+    assert.equal(observations[0]!.error_class, "invalid_result");
+    assert.equal(JSON.stringify(observations[0]).includes("private"), false);
+  });
+}
+
+test("evaluator mutation after validation cannot change exported metrics", async () => {
+  const observations: ShadowObservation[] = [];
+  const result = { ...RESULT, evidenceProfiles: [...RESULT.evidenceProfiles] };
+  let releaseUpstream!: (response: Response) => void;
+  const upstream = new Promise<Response>((resolve) => { releaseUpstream = resolve; });
+  const handler = createShadowHandler({
+    ...baseOptions(observations),
+    evaluate: async () => result,
+    fetchUpstream: () => upstream,
+  });
+  const pending = handler(new Request("https://travel.example/availability/search"));
+  await new Promise<void>((resolve) => setImmediate(resolve));
+  result.evidenceProfiles.push("private details added after validation");
+  releaseUpstream(new Response("origin"));
+  await pending;
+  assert.equal(observations[0]!.error_class, "none");
+  assert.deepEqual(observations[0]!.evidence_profiles, RESULT.evidenceProfiles);
+});
+
+test("an input builder finishing after timeout does not start evaluation", async () => {
+  const observations: ShadowObservation[] = [];
+  let finishInput!: (input: unknown) => void;
+  let evaluations = 0;
+  const handler = createShadowHandler({
+    ...baseOptions(observations),
+    evaluationTimeoutMs: 5,
+    buildEvaluationInput: () => new Promise<unknown>((resolve) => { finishInput = resolve; }),
+    evaluate: async () => { evaluations++; return RESULT; },
+  });
+  await handler(new Request("https://travel.example/availability/search"));
+  finishInput({ method: "GET" });
+  await new Promise<void>((resolve) => setImmediate(resolve));
+  assert.equal(observations[0]!.error_class, "timeout");
+  assert.equal(evaluations, 0);
+});

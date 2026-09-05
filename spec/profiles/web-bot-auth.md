@@ -4,7 +4,9 @@
 - **Class:** `request_integrity`
 - **Status:** Adapter sketch for draft `0.1`
 
-Web Bot Auth is the incumbent way some CDNs recognize signed agents: HTTP Message Signatures with `tag="web-bot-auth"`, a `Signature-Agent` key directory, and operator registration. This profile tells an Agent Clearance verifier how to treat that existing signature as `request_integrity` evidence.
+Web Bot Auth is IETF work on cryptographically authenticating automated clients and conveying operator information. The [working-group charter](https://datatracker.ietf.org/doc/charter-ietf-webbotauth/) covers agents acting for end users but excludes authenticating the end user and defining an intent vocabulary. Cloudflare documents [one deployment](https://developers.cloudflare.com/bots/reference/bot-verification/web-bot-auth/) using HTTP Message Signatures, `tag="web-bot-auth"`, and a `Signature-Agent` directory. Vendor directory registration is a deployment policy, not an Agent Clearance protocol requirement.
+
+This profile sketches how an Agent Clearance verifier could treat such a signature as `request_integrity` evidence. The Python reference does not implement it and rejects presentations that claim it. No Web Bot Auth interoperability has been demonstrated by this repository.
 
 It is an adapter, not a second trust dimension. It does not replace an origin-scoped mandate.
 
@@ -43,7 +45,7 @@ If the origin cannot verify Web Bot Auth locally and would have to call a vendor
 - Replay rules beyond what the origin's Web Bot Auth deployment already enforces.
 - Treating a signed agent as authorized for writes, payments, or account access.
 
-Cloudflare's own documentation describes signed agents as recognition, with replay defense and application authorization left to the profile and the origin. This adapter preserves that gap instead of filling it with a trust score.
+Automated-client authentication alone does not establish a principal's delegation or satisfy the receiving application's authorization policy. A future adapter must demonstrate local verification and request binding before claiming support.
 
 ## When to use it
 
