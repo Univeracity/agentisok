@@ -1,14 +1,114 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="280" viewBox="0 0 256 280" role="img" aria-labelledby="title description">
   <title id="title">AgentIsOK</title>
-  <desc id="description">Gold AI above OK, with a green checkmark crossing the space between the two lines.</desc>
-  <g fill="#B8892E">
-      <path fill-rule="evenodd" d="M26 116 58 30H84L116 116H93L87 98H54L48 116ZM60 80H81L70.5 49Z"/>
-      <path d="M143 30H166V116H143Z"/>
-    </g>
-    <g fill="#172B24">
-      <path fill-rule="evenodd" d="M70 163C42 163 26 180 26 207S42 251 70 251 114 234 114 207 98 163 70 163ZM70 184C84 184 92 192 92 207S84 230 70 230 48 222 48 207 56 184 70 184Z"/>
-      <path d="M143 165H166V199L194 165H223L188 206 225 249H195L166 214V249H143Z"/>
-    </g>
-    <path d="M94 128 127 153 220 72" fill="none" stroke="#087F5B"
-          stroke-width="19" stroke-linecap="square" stroke-linejoin="miter"/>
+  <desc id="description">Gold AI above OK with an emerald checkmark, satin shading, fine bevels, and shallow dimensional edges.</desc>
+  <defs><linearGradient id="relief-light-gold-face" x1="0" y1="0" x2=".85" y2="1">
+          <stop offset="0" stop-color="#F9E0A0"/>
+          <stop offset=".42" stop-color="#D5A443"/>
+          <stop offset="1" stop-color="#AE7927"/>
+        </linearGradient>
+        <linearGradient id="relief-light-gold-bevel" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FFF0BD"/>
+          <stop offset="1" stop-color="#D5A443"/>
+        </linearGradient><linearGradient id="relief-light-ink-face" x1="0" y1="0" x2=".85" y2="1">
+          <stop offset="0" stop-color="#355B4B"/>
+          <stop offset=".42" stop-color="#203C30"/>
+          <stop offset="1" stop-color="#11281F"/>
+        </linearGradient>
+        <linearGradient id="relief-light-ink-bevel" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#749885"/>
+          <stop offset="1" stop-color="#203C30"/>
+        </linearGradient><linearGradient id="relief-light-green-face" x1="0" y1="0" x2=".85" y2="1">
+          <stop offset="0" stop-color="#2AC292"/>
+          <stop offset=".42" stop-color="#0F9567"/>
+          <stop offset="1" stop-color="#056443"/>
+        </linearGradient>
+        <linearGradient id="relief-light-green-bevel" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#91F1CB"/>
+          <stop offset="1" stop-color="#0F9567"/>
+        </linearGradient><path id="relief-light-a" fill-rule="evenodd" d="M26 116 58 30H84L116 116H93L87 98H54L48 116ZM60 80H81L70.5 49Z"/><mask id="relief-light-a-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-a" fill="white"/>
+              <use href="#relief-light-a" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-light-a-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-a" fill="white"/>
+              <use href="#relief-light-a" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-light-a-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-a" fill="white"/>
+              <use href="#relief-light-a" fill="black" transform="translate(.45 .6)"/>
+            </mask><path id="relief-light-i" fill-rule="evenodd" d="M143 30H166V116H143Z"/><mask id="relief-light-i-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-i" fill="white"/>
+              <use href="#relief-light-i" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-light-i-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-i" fill="white"/>
+              <use href="#relief-light-i" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-light-i-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-i" fill="white"/>
+              <use href="#relief-light-i" fill="black" transform="translate(.45 .6)"/>
+            </mask><path id="relief-light-o" fill-rule="evenodd" d="M70 163C42 163 26 180 26 207S42 251 70 251 114 234 114 207 98 163 70 163ZM70 184C84 184 92 192 92 207S84 230 70 230 48 222 48 207 56 184 70 184Z"/><mask id="relief-light-o-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-o" fill="white"/>
+              <use href="#relief-light-o" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-light-o-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-o" fill="white"/>
+              <use href="#relief-light-o" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-light-o-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-o" fill="white"/>
+              <use href="#relief-light-o" fill="black" transform="translate(.45 .6)"/>
+            </mask><path id="relief-light-k" fill-rule="evenodd" d="M143 165H166V199L194 165H223L188 206 225 249H195L166 214V249H143Z"/><mask id="relief-light-k-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-k" fill="white"/>
+              <use href="#relief-light-k" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-light-k-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-k" fill="white"/>
+              <use href="#relief-light-k" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-light-k-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-k" fill="white"/>
+              <use href="#relief-light-k" fill="black" transform="translate(.45 .6)"/>
+            </mask><path id="relief-light-check" fill-rule="evenodd" d="M92.161 114.693 126.567 140.758 220.92 58.579 233.401 72.901 127.433 165.242 80.68 129.83Z"/><mask id="relief-light-check-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-check" fill="white"/>
+              <use href="#relief-light-check" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-light-check-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-check" fill="white"/>
+              <use href="#relief-light-check" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-light-check-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-light-check" fill="white"/>
+              <use href="#relief-light-check" fill="black" transform="translate(.45 .6)"/>
+            </mask></defs>
+<use href="#relief-light-a" fill="#79501B" transform="translate(2.6 4)"/>
+<use href="#relief-light-a" fill="#79501B" transform="translate(1.95 3)"/>
+<use href="#relief-light-a" fill="#79501B" transform="translate(1.3 2)"/>
+<use href="#relief-light-a" fill="#79501B" transform="translate(0.65 1)"/>
+<use href="#relief-light-a" fill="url(#relief-light-gold-face)"/>
+<use href="#relief-light-a" fill="#956522" opacity=".8" mask="url(#relief-light-a-shade)"/>
+<use href="#relief-light-a" fill="url(#relief-light-gold-bevel)" mask="url(#relief-light-a-lit)"/>
+<use href="#relief-light-a" fill="#FFF0BD" opacity=".75" mask="url(#relief-light-a-rim)"/>
+<use href="#relief-light-i" fill="#79501B" transform="translate(2.6 4)"/>
+<use href="#relief-light-i" fill="#79501B" transform="translate(1.95 3)"/>
+<use href="#relief-light-i" fill="#79501B" transform="translate(1.3 2)"/>
+<use href="#relief-light-i" fill="#79501B" transform="translate(0.65 1)"/>
+<use href="#relief-light-i" fill="url(#relief-light-gold-face)"/>
+<use href="#relief-light-i" fill="#956522" opacity=".8" mask="url(#relief-light-i-shade)"/>
+<use href="#relief-light-i" fill="url(#relief-light-gold-bevel)" mask="url(#relief-light-i-lit)"/>
+<use href="#relief-light-i" fill="#FFF0BD" opacity=".75" mask="url(#relief-light-i-rim)"/>
+<use href="#relief-light-o" fill="#0B1B14" transform="translate(2.6 4)"/>
+<use href="#relief-light-o" fill="#0B1B14" transform="translate(1.95 3)"/>
+<use href="#relief-light-o" fill="#0B1B14" transform="translate(1.3 2)"/>
+<use href="#relief-light-o" fill="#0B1B14" transform="translate(0.65 1)"/>
+<use href="#relief-light-o" fill="url(#relief-light-ink-face)"/>
+<use href="#relief-light-o" fill="#0A1B13" opacity=".8" mask="url(#relief-light-o-shade)"/>
+<use href="#relief-light-o" fill="url(#relief-light-ink-bevel)" mask="url(#relief-light-o-lit)"/>
+<use href="#relief-light-o" fill="#749885" opacity=".75" mask="url(#relief-light-o-rim)"/>
+<use href="#relief-light-k" fill="#0B1B14" transform="translate(2.6 4)"/>
+<use href="#relief-light-k" fill="#0B1B14" transform="translate(1.95 3)"/>
+<use href="#relief-light-k" fill="#0B1B14" transform="translate(1.3 2)"/>
+<use href="#relief-light-k" fill="#0B1B14" transform="translate(0.65 1)"/>
+<use href="#relief-light-k" fill="url(#relief-light-ink-face)"/>
+<use href="#relief-light-k" fill="#0A1B13" opacity=".8" mask="url(#relief-light-k-shade)"/>
+<use href="#relief-light-k" fill="url(#relief-light-ink-bevel)" mask="url(#relief-light-k-lit)"/>
+<use href="#relief-light-k" fill="#749885" opacity=".75" mask="url(#relief-light-k-rim)"/>
+<use href="#relief-light-check" fill="#034D34" transform="translate(2.6 4)"/>
+<use href="#relief-light-check" fill="#034D34" transform="translate(1.95 3)"/>
+<use href="#relief-light-check" fill="#034D34" transform="translate(1.3 2)"/>
+<use href="#relief-light-check" fill="#034D34" transform="translate(0.65 1)"/>
+<use href="#relief-light-check" fill="url(#relief-light-green-face)"/>
+<use href="#relief-light-check" fill="#035637" opacity=".8" mask="url(#relief-light-check-shade)"/>
+<use href="#relief-light-check" fill="url(#relief-light-green-bevel)" mask="url(#relief-light-check-lit)"/>
+<use href="#relief-light-check" fill="#91F1CB" opacity=".75" mask="url(#relief-light-check-rim)"/>
 </svg>

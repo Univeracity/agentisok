@@ -1,16 +1,114 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
   <title id="title">AgentIsOK</title>
-  <desc id="description">Gold AI above OK, with a green checkmark crossing the space between the two lines.</desc>
-  <rect width="512" height="512" rx="112" fill="#10241D"/><g transform="translate(64 42) scale(1.5)">
-    <g fill="#E7C46F">
-      <path fill-rule="evenodd" d="M26 116 58 30H84L116 116H93L87 98H54L48 116ZM60 80H81L70.5 49Z"/>
-      <path d="M143 30H166V116H143Z"/>
-    </g>
-    <g fill="#F4F2EA">
-      <path fill-rule="evenodd" d="M70 163C42 163 26 180 26 207S42 251 70 251 114 234 114 207 98 163 70 163ZM70 184C84 184 92 192 92 207S84 230 70 230 48 222 48 207 56 184 70 184Z"/>
-      <path d="M143 165H166V199L194 165H223L188 206 225 249H195L166 214V249H143Z"/>
-    </g>
-    <path d="M94 128 127 153 220 72" fill="none" stroke="#43C995"
-          stroke-width="19" stroke-linecap="square" stroke-linejoin="miter"/>
-    </g>
+  <desc id="description">Gold AI above OK with an emerald checkmark, satin shading, fine bevels, and shallow dimensional edges.</desc>
+  <rect width="512" height="512" rx="112" fill="#10241D"/><g transform="translate(64 42) scale(1.5)"><defs><linearGradient id="relief-dark-gold-face" x1="0" y1="0" x2=".85" y2="1">
+          <stop offset="0" stop-color="#FFF0B8"/>
+          <stop offset=".42" stop-color="#ECC975"/>
+          <stop offset="1" stop-color="#C79A3F"/>
+        </linearGradient>
+        <linearGradient id="relief-dark-gold-bevel" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FFF0BD"/>
+          <stop offset="1" stop-color="#ECC975"/>
+        </linearGradient><linearGradient id="relief-dark-ink-face" x1="0" y1="0" x2=".85" y2="1">
+          <stop offset="0" stop-color="#FFFDF5"/>
+          <stop offset=".42" stop-color="#ECECDF"/>
+          <stop offset="1" stop-color="#BFC8B9"/>
+        </linearGradient>
+        <linearGradient id="relief-dark-ink-bevel" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FFFFFF"/>
+          <stop offset="1" stop-color="#ECECDF"/>
+        </linearGradient><linearGradient id="relief-dark-green-face" x1="0" y1="0" x2=".85" y2="1">
+          <stop offset="0" stop-color="#4BDCAB"/>
+          <stop offset=".42" stop-color="#20AA7B"/>
+          <stop offset="1" stop-color="#08744D"/>
+        </linearGradient>
+        <linearGradient id="relief-dark-green-bevel" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#91F1CB"/>
+          <stop offset="1" stop-color="#20AA7B"/>
+        </linearGradient><path id="relief-dark-a" fill-rule="evenodd" d="M26 116 58 30H84L116 116H93L87 98H54L48 116ZM60 80H81L70.5 49Z"/><mask id="relief-dark-a-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-a" fill="white"/>
+              <use href="#relief-dark-a" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-dark-a-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-a" fill="white"/>
+              <use href="#relief-dark-a" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-dark-a-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-a" fill="white"/>
+              <use href="#relief-dark-a" fill="black" transform="translate(.45 .6)"/>
+            </mask><path id="relief-dark-i" fill-rule="evenodd" d="M143 30H166V116H143Z"/><mask id="relief-dark-i-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-i" fill="white"/>
+              <use href="#relief-dark-i" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-dark-i-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-i" fill="white"/>
+              <use href="#relief-dark-i" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-dark-i-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-i" fill="white"/>
+              <use href="#relief-dark-i" fill="black" transform="translate(.45 .6)"/>
+            </mask><path id="relief-dark-o" fill-rule="evenodd" d="M70 163C42 163 26 180 26 207S42 251 70 251 114 234 114 207 98 163 70 163ZM70 184C84 184 92 192 92 207S84 230 70 230 48 222 48 207 56 184 70 184Z"/><mask id="relief-dark-o-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-o" fill="white"/>
+              <use href="#relief-dark-o" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-dark-o-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-o" fill="white"/>
+              <use href="#relief-dark-o" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-dark-o-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-o" fill="white"/>
+              <use href="#relief-dark-o" fill="black" transform="translate(.45 .6)"/>
+            </mask><path id="relief-dark-k" fill-rule="evenodd" d="M143 165H166V199L194 165H223L188 206 225 249H195L166 214V249H143Z"/><mask id="relief-dark-k-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-k" fill="white"/>
+              <use href="#relief-dark-k" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-dark-k-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-k" fill="white"/>
+              <use href="#relief-dark-k" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-dark-k-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-k" fill="white"/>
+              <use href="#relief-dark-k" fill="black" transform="translate(.45 .6)"/>
+            </mask><path id="relief-dark-check" fill-rule="evenodd" d="M92.161 114.693 126.567 140.758 220.92 58.579 233.401 72.901 127.433 165.242 80.68 129.83Z"/><mask id="relief-dark-check-lit" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-check" fill="white"/>
+              <use href="#relief-dark-check" fill="black" transform="translate(2.2 2.8)"/>
+            </mask><mask id="relief-dark-check-shade" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-check" fill="white"/>
+              <use href="#relief-dark-check" fill="black" transform="translate(-2.2 -2.8)"/>
+            </mask><mask id="relief-dark-check-rim" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="280">
+              <use href="#relief-dark-check" fill="white"/>
+              <use href="#relief-dark-check" fill="black" transform="translate(.45 .6)"/>
+            </mask></defs>
+<use href="#relief-dark-a" fill="#79501B" transform="translate(2.6 4)"/>
+<use href="#relief-dark-a" fill="#79501B" transform="translate(1.95 3)"/>
+<use href="#relief-dark-a" fill="#79501B" transform="translate(1.3 2)"/>
+<use href="#relief-dark-a" fill="#79501B" transform="translate(0.65 1)"/>
+<use href="#relief-dark-a" fill="url(#relief-dark-gold-face)"/>
+<use href="#relief-dark-a" fill="#956522" opacity=".8" mask="url(#relief-dark-a-shade)"/>
+<use href="#relief-dark-a" fill="url(#relief-dark-gold-bevel)" mask="url(#relief-dark-a-lit)"/>
+<use href="#relief-dark-a" fill="#FFF0BD" opacity=".75" mask="url(#relief-dark-a-rim)"/>
+<use href="#relief-dark-i" fill="#79501B" transform="translate(2.6 4)"/>
+<use href="#relief-dark-i" fill="#79501B" transform="translate(1.95 3)"/>
+<use href="#relief-dark-i" fill="#79501B" transform="translate(1.3 2)"/>
+<use href="#relief-dark-i" fill="#79501B" transform="translate(0.65 1)"/>
+<use href="#relief-dark-i" fill="url(#relief-dark-gold-face)"/>
+<use href="#relief-dark-i" fill="#956522" opacity=".8" mask="url(#relief-dark-i-shade)"/>
+<use href="#relief-dark-i" fill="url(#relief-dark-gold-bevel)" mask="url(#relief-dark-i-lit)"/>
+<use href="#relief-dark-i" fill="#FFF0BD" opacity=".75" mask="url(#relief-dark-i-rim)"/>
+<use href="#relief-dark-o" fill="#62746A" transform="translate(2.6 4)"/>
+<use href="#relief-dark-o" fill="#62746A" transform="translate(1.95 3)"/>
+<use href="#relief-dark-o" fill="#62746A" transform="translate(1.3 2)"/>
+<use href="#relief-dark-o" fill="#62746A" transform="translate(0.65 1)"/>
+<use href="#relief-dark-o" fill="url(#relief-dark-ink-face)"/>
+<use href="#relief-dark-o" fill="#859889" opacity=".8" mask="url(#relief-dark-o-shade)"/>
+<use href="#relief-dark-o" fill="url(#relief-dark-ink-bevel)" mask="url(#relief-dark-o-lit)"/>
+<use href="#relief-dark-o" fill="#FFFFFF" opacity=".75" mask="url(#relief-dark-o-rim)"/>
+<use href="#relief-dark-k" fill="#62746A" transform="translate(2.6 4)"/>
+<use href="#relief-dark-k" fill="#62746A" transform="translate(1.95 3)"/>
+<use href="#relief-dark-k" fill="#62746A" transform="translate(1.3 2)"/>
+<use href="#relief-dark-k" fill="#62746A" transform="translate(0.65 1)"/>
+<use href="#relief-dark-k" fill="url(#relief-dark-ink-face)"/>
+<use href="#relief-dark-k" fill="#859889" opacity=".8" mask="url(#relief-dark-k-shade)"/>
+<use href="#relief-dark-k" fill="url(#relief-dark-ink-bevel)" mask="url(#relief-dark-k-lit)"/>
+<use href="#relief-dark-k" fill="#FFFFFF" opacity=".75" mask="url(#relief-dark-k-rim)"/>
+<use href="#relief-dark-check" fill="#034D34" transform="translate(2.6 4)"/>
+<use href="#relief-dark-check" fill="#034D34" transform="translate(1.95 3)"/>
+<use href="#relief-dark-check" fill="#034D34" transform="translate(1.3 2)"/>
+<use href="#relief-dark-check" fill="#034D34" transform="translate(0.65 1)"/>
+<use href="#relief-dark-check" fill="url(#relief-dark-green-face)"/>
+<use href="#relief-dark-check" fill="#035637" opacity=".8" mask="url(#relief-dark-check-shade)"/>
+<use href="#relief-dark-check" fill="url(#relief-dark-green-bevel)" mask="url(#relief-dark-check-lit)"/>
+<use href="#relief-dark-check" fill="#91F1CB" opacity=".75" mask="url(#relief-dark-check-rim)"/></g>
 </svg>

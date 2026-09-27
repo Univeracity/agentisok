@@ -14,12 +14,12 @@
   <title
      id="title">AgentIsOK</title>
   <desc
-     id="description">Gold AI above OK with an emerald checkmark, satin shading, fine bevels, and shallow dimensional edges.</desc>
+     id="description">Flat AgentIsOK logo.</desc>
   <g
      transform="matrix(0.52,0,0,0.52,10,4)"
      id="g18">
     <g
-       fill="#172b24"
+       fill="#e7c46f"
        id="g8">
       <path
          fill-rule="evenodd"
@@ -30,7 +30,7 @@
          id="path6" />
     </g>
     <g
-       fill="#172b24"
+       fill="#f4f2ea"
        id="g14">
       <path
          fill-rule="evenodd"
@@ -43,7 +43,7 @@
     <path
        d="m 94,128 33,25 93,-81"
        fill="none"
-       stroke="#172b24"
+       stroke="#43c995"
        stroke-width="19"
        stroke-linecap="square"
        stroke-linejoin="miter"
@@ -52,7 +52,7 @@
   <g
      aria-label="AgentIsOK"
      id="text20"
-     style="font-weight:600;font-size:68px;font-family:Inter;letter-spacing:-1.5;fill:#172b24">
+     style="font-weight:600;font-size:68px;font-family:Inter;letter-spacing:-1.5;fill:#f4f2ea">
     <path
        d="m 171.66016,99 h 9.69531 l 4.05078,-12.251953 h 18.49414 L 208.11719,99 h 9.72851 L 200.18164,49.527344 h -11.25586 z m 16.10351,-19.390625 2.0918,-6.308594 c 1.36133,-4.416015 2.85547,-9.960937 4.61523,-16.867187 1.82617,6.839843 3.38672,12.318359 4.84766,16.867187 l 2.1582,6.308594 z"
        id="path28" />

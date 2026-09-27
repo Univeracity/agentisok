@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="280" viewBox="0 0 256 280" role="img" aria-labelledby="title description">
   <title id="title">AgentIsOK</title>
-  <desc id="description">Gold AI above OK with an emerald checkmark, satin shading, fine bevels, and shallow dimensional edges.</desc>
-  <g fill="#172B24">
+  <desc id="description">Flat gold AI above OK with a green checkmark.</desc>
+  <g fill="#E7C46F">
       <path fill-rule="evenodd" d="M26 116 58 30H84L116 116H93L87 98H54L48 116ZM60 80H81L70.5 49Z"/>
       <path d="M143 30H166V116H143Z"/>
     </g>
-    <g fill="#172B24">
+    <g fill="#F4F2EA">
       <path fill-rule="evenodd" d="M70 163C42 163 26 180 26 207S42 251 70 251 114 234 114 207 98 163 70 163ZM70 184C84 184 92 192 92 207S84 230 70 230 48 222 48 207 56 184 70 184Z"/>
       <path d="M143 165H166V199L194 165H223L188 206 225 249H195L166 214V249H143Z"/>
     </g>
-    <path d="M94 128 127 153 220 72" fill="none" stroke="#172B24"
+    <path d="M94 128 127 153 220 72" fill="none" stroke="#43C995"
           stroke-width="19" stroke-linecap="square" stroke-linejoin="miter"/>
 </svg>
